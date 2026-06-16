@@ -59,19 +59,35 @@ winnable**, because:
 - Privacy/consent: always-on cameras in workplaces trigger labor, union, and legal concerns.
   This must be designed in (recording indicators, on-prem storage, retention policy), not bolted on.
 
-## 4. Strategy: don't build silicon, own the stack that matters
+## 4. Strategy: buy the hardware, own the intelligence (software-led)
 
-Speed-to-market here = first to **certify + sell into industrial channels**, not first to
-design optics.
+**We do not manufacture anything.** We white-label glasses that are *already certified and
+on the market*, rebrand them **Allerion**, and put 100% of the value in **ALLERION.ai** and
+the **crew voice** layer. This is consistent with the company line: *we don't sell software,
+we deploy intelligence* — here, the hardware is just the carrier.
 
-1. **White-label / ODM the hardware.** Camera-glasses reference designs exist out of
-   Shenzhen. Our IP is the certification, the SOP pipeline, and the channel — not the camera module.
-2. **Start Z87.1 / EN 166 certification first** (longest lead time). Engage a test lab early
-   (NTS, SGS, Intertek, or equivalent).
-3. **Build the software loop** — the compounding asset: POV capture → transcription →
-   structured SOP / inspection / progress record, wired into the existing Allerion agents.
-4. **Pre-sell one design-partner site before tooling anything.** The reviewer is the ICP.
-   Find five of them; build to their requirements.
+Why this beats building:
+- **Zero certification lead time** if we pick a camera-free base (see below) — no re-cert, no
+  factory, no tooling, no months-long test cycle.
+- **Capital-light.** Reseller/white-label agreement + software, not a hardware company.
+- **Sidesteps the privacy fight** that made Lucyd drop the camera — voice-first needs no camera.
+
+### Phase 1 — voice-first, ship now (recommended base: Lucyd Armor)
+Rebrand a discreet, already-certified, **camera-free** audio frame (Lucyd Armor: ANSI
+Z87.1+ / CSA Z94.3 / EN 166, mic + open-ear audio + walkie-talkie VOIP, 8-hr battery) as the
+**Allerion** glasses. Deploy ALLERION.ai + crew voice on it. No re-certification, no privacy
+blocker, fastest path to a deployed product.
+
+### Phase 2 — add a camera SKU for POV → SOP capture
+For sites that want video documentation and can manage consent, license a camera-equipped
+certified device (Vuzix Blade 2 class / RealWear for rugged, Iristick for ATEX). The video →
+SOP pipeline (§6) plugs into the same ALLERION.ai backend.
+
+### Open commercial questions to close
+- White-label/OEM terms with the chosen vendor (Lucyd/Innovative Eyewear or a frame ODM).
+- Branding under a reseller agreement vs. becoming the named "manufacturer" — the latter can
+  shift certification responsibility onto Allerion, so structure the contract deliberately.
+- Volume commitments and per-unit economics.
 
 ## 5. Ideal Customer Profile (v0)
 
@@ -93,15 +109,44 @@ design optics.
 This is squarely buildable today with current models and is the highest-leverage place to
 start, independent of hardware timelines.
 
+## 6a. Crew Voice — the voice-first layer (Phase 1 hero feature)
+
+> *Founder's concept — definition below is a working interpretation; needs confirmation.*
+
+**Crew Voice** is the always-available, hands-free voice layer that runs on the Allerion
+glasses and connects every crew member to each other and to ALLERION.ai. It's the feature
+that works on a camera-free frame, so it ships in Phase 1.
+
+Working interpretation of the capability set:
+- **Crew-to-crew comms** — push-to-talk / VOIP channels across a site (the base hardware
+  already has walkie-talkie VOIP), but routed through ALLERION.ai so it's more than a radio.
+- **Hands-free commands** — "Allerion, log a material request for rebar at gridline 4",
+  "start an inspection", "what's the torque spec for this joint?" — voice in, answer or action out.
+- **Voice-logged field notes** → automatically transcribed, structured, and written back to
+  SOPs / ERP / the digital twin. Captures the "pulled in four directions" reality the original
+  reviewer described, with no hands and no phone.
+- **Agent-mediated coordination** — ALLERION.ai sits on the channel: summarizing, routing
+  requests, surfacing the right spec or drawing, escalating to a remote expert.
+- **Sovereign/on-prem voice** — speech processing on private infrastructure for sites that
+  can't send audio to the cloud (ties to the existing Sovereign AI capability).
+
+Why it's the right Phase 1 hero: it delivers daily value with **no camera, no re-cert, no
+privacy blocker**, and it's the natural front-end to the agent stack Allerion already builds.
+
+**Questions to pin down crew voice (need founder input):**
+- Is it primarily **crew↔crew comms**, **crew↔AI assistant**, or both equally?
+- Real-time coordination, or async capture-and-structure, or both?
+- Does it need to work offline / fully on-prem from day one?
+
 ## 7. Proposed first milestones
 
 | # | Milestone | Why first |
 |---|-----------|-----------|
-| 1 | Software pipeline prototype (video → structured SOP) using off-the-shelf footage | Proves the value with zero hardware dependency |
-| 2 | Certification scoping call with a test lab | Longest lead time — start the clock |
-| 3 | 3–5 design-partner LOIs from ICP sites | Validates demand, shapes requirements, de-risks tooling |
-| 4 | ODM hardware shortlist + sample units | Cheapest path to a wearable demo |
-| 5 | Privacy/consent + data-governance design | Gating requirement for industrial deployment |
+| 1 | **Crew Voice prototype** on a stock camera-free certified frame (Lucyd Armor or sample unit) → ALLERION.ai | Proves the Phase 1 hero with zero manufacturing / cert dependency |
+| 2 | **Software pipeline** (voice/video → structured SOP) wired to the existing agents | The compounding asset; works against off-the-shelf footage too |
+| 3 | **White-label / OEM terms** with the chosen frame vendor | Unlocks shipping rebranded "Allerion" units |
+| 4 | 3–5 design-partner LOIs from ICP sites | Validates demand and shapes the rollout |
+| 5 | Privacy/consent + (for Phase 2 camera SKU) re-certification scoping | Gating requirements before camera deployment |
 
 ## 8. Hardware sourcing — what already exists (don't build from scratch)
 
