@@ -1,0 +1,314 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8" />
+<meta name="viewport" content="width=device-width, initial-scale=1.0" />
+<title>Allerion Glasses — Autonomous intelligence for the built world</title>
+<meta name="description" content="Certified safety glasses, rebranded Allerion, running ALLERION.ai and Crew Voice. Hands-free intelligence for the shop floor and the job site." />
+<style>
+  :root {
+    --bg: #0a0a0b;
+    --panel: #121214;
+    --line: #232327;
+    --fg: #ededf0;
+    --muted: #8a8a93;
+    --accent: #e8e8ea;
+    --hi: #6ee7b7;
+    --mono: ui-monospace, SFMono-Regular, Menlo, Consolas, monospace;
+    --sans: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, Helvetica, Arial, sans-serif;
+  }
+  * { box-sizing: border-box; margin: 0; padding: 0; }
+  html { scroll-behavior: smooth; }
+  body {
+    background: var(--bg);
+    color: var(--fg);
+    font-family: var(--sans);
+    line-height: 1.6;
+    -webkit-font-smoothing: antialiased;
+  }
+  .wrap { max-width: 920px; margin: 0 auto; padding: 0 24px; }
+  a { color: inherit; }
+
+  /* Hero */
+  header.hero {
+    text-align: center;
+    padding: 120px 24px 80px;
+    border-bottom: 1px solid var(--line);
+  }
+  .logo {
+    font-family: var(--mono);
+    font-size: 28px;
+    letter-spacing: 2px;
+    color: var(--muted);
+    margin-bottom: 28px;
+  }
+  .hero h1 {
+    font-size: clamp(32px, 6vw, 56px);
+    font-weight: 700;
+    letter-spacing: -0.02em;
+    line-height: 1.08;
+    margin-bottom: 20px;
+  }
+  .hero p.lede {
+    font-size: clamp(16px, 2.4vw, 20px);
+    color: var(--muted);
+    max-width: 620px;
+    margin: 0 auto 36px;
+  }
+  .cta {
+    display: inline-block;
+    background: var(--fg);
+    color: var(--bg);
+    font-weight: 600;
+    padding: 14px 28px;
+    border-radius: 8px;
+    text-decoration: none;
+    transition: transform .12s ease, opacity .12s ease;
+  }
+  .cta:hover { transform: translateY(-1px); opacity: .9; }
+  .cta.secondary {
+    background: transparent;
+    color: var(--fg);
+    border: 1px solid var(--line);
+    margin-left: 10px;
+  }
+
+  /* Sections */
+  section { padding: 72px 0; border-bottom: 1px solid var(--line); }
+  .eyebrow {
+    font-family: var(--mono);
+    font-size: 12px;
+    letter-spacing: 2px;
+    text-transform: uppercase;
+    color: var(--hi);
+    margin-bottom: 14px;
+  }
+  h2 { font-size: clamp(24px, 4vw, 34px); letter-spacing: -0.01em; margin-bottom: 16px; }
+  p.body { color: var(--muted); max-width: 660px; }
+
+  .grid {
+    display: grid;
+    grid-template-columns: repeat(auto-fit, minmax(240px, 1fr));
+    gap: 18px;
+    margin-top: 36px;
+  }
+  .card {
+    background: var(--panel);
+    border: 1px solid var(--line);
+    border-radius: 12px;
+    padding: 24px;
+  }
+  .card h3 { font-size: 18px; margin-bottom: 8px; }
+  .card p { color: var(--muted); font-size: 15px; }
+  .card .tag {
+    font-family: var(--mono);
+    font-size: 11px;
+    letter-spacing: 1px;
+    color: var(--hi);
+    text-transform: uppercase;
+    display: block;
+    margin-bottom: 12px;
+  }
+
+  /* Phases */
+  .phase { display: flex; gap: 20px; align-items: flex-start; padding: 22px 0; border-top: 1px solid var(--line); }
+  .phase:first-of-type { border-top: none; }
+  .phase .num {
+    font-family: var(--mono);
+    font-size: 13px;
+    color: var(--bg);
+    background: var(--hi);
+    border-radius: 6px;
+    padding: 4px 9px;
+    flex: 0 0 auto;
+    font-weight: 700;
+  }
+  .phase h3 { font-size: 19px; margin-bottom: 6px; }
+  .phase p { color: var(--muted); font-size: 15px; }
+
+  .placeholder {
+    border: 1px dashed #3a3a40;
+    background: rgba(110,231,183,0.04);
+    border-radius: 10px;
+    padding: 16px 18px;
+    margin-top: 20px;
+    font-size: 14px;
+    color: var(--muted);
+  }
+  .placeholder strong { color: var(--hi); font-family: var(--mono); font-size: 12px; letter-spacing: 1px; }
+
+  /* Certification strip */
+  .certs { display: flex; flex-wrap: wrap; gap: 12px; margin-top: 28px; }
+  .cert {
+    font-family: var(--mono);
+    font-size: 12px;
+    letter-spacing: 1px;
+    color: var(--muted);
+    border: 1px solid var(--line);
+    border-radius: 999px;
+    padding: 7px 16px;
+  }
+
+  /* Signup */
+  #signup { text-align: center; }
+  form {
+    display: flex;
+    gap: 10px;
+    max-width: 480px;
+    margin: 28px auto 12px;
+    flex-wrap: wrap;
+    justify-content: center;
+  }
+  input[type="email"] {
+    flex: 1 1 240px;
+    background: var(--panel);
+    border: 1px solid var(--line);
+    border-radius: 8px;
+    color: var(--fg);
+    padding: 14px 16px;
+    font-size: 15px;
+    font-family: var(--sans);
+  }
+  input[type="email"]:focus { outline: none; border-color: var(--hi); }
+  button[type="submit"] {
+    background: var(--fg);
+    color: var(--bg);
+    border: none;
+    border-radius: 8px;
+    padding: 14px 24px;
+    font-weight: 600;
+    font-size: 15px;
+    cursor: pointer;
+  }
+  .fineprint { color: var(--muted); font-size: 13px; }
+
+  footer {
+    text-align: center;
+    padding: 48px 24px 64px;
+    color: var(--muted);
+    font-size: 13px;
+  }
+  footer .logo { font-size: 18px; margin-bottom: 16px; }
+  .quote { color: var(--accent); font-style: italic; margin-top: 8px; }
+</style>
+</head>
+<body>
+
+  <header class="hero">
+    <div class="wrap">
+      <div class="logo">_/\_</div>
+      <h1>The job site can talk now.</h1>
+      <p class="lede">
+        Certified safety glasses, rebranded Allerion, running <strong>ALLERION.ai</strong> and
+        <strong>Crew Voice</strong> — hands-free intelligence for the shop floor and the field.
+        We don't make hardware. We deploy intelligence onto it.
+      </p>
+      <a class="cta" href="#signup">Become a design partner</a>
+      <a class="cta secondary" href="#how">How it works</a>
+    </div>
+  </header>
+
+  <section id="how">
+    <div class="wrap">
+      <div class="eyebrow">The idea</div>
+      <h2>Eye protection your crew already has to wear — now it thinks.</h2>
+      <p class="body">
+        Frontline crews already wear safety glasses by law. We start there: a discreet,
+        already-certified frame, rebranded Allerion, with ALLERION.ai and Crew Voice running
+        on it. No new gadget to justify, no certification to wait on — intelligence on the
+        protection they're already required to wear.
+      </p>
+      <div class="grid">
+        <div class="card">
+          <span class="tag">Hands-free</span>
+          <h3>Capture without stopping</h3>
+          <p>Log material requests, notes, and process changes by voice while your hands stay on the work.</p>
+        </div>
+        <div class="card">
+          <span class="tag">Crew Voice</span>
+          <h3>Everyone on one channel</h3>
+          <p>Your crew, connected — with ALLERION.ai on the line, coordinating and capturing.</p>
+        </div>
+        <div class="card">
+          <span class="tag">Operations intelligence</span>
+          <h3>Talk → structured record</h3>
+          <p>Voice and field capture become SOPs, inspections, and progress records, written back automatically.</p>
+        </div>
+      </div>
+    </div>
+  </section>
+
+  <section>
+    <div class="wrap">
+      <div class="eyebrow">Crew Voice</div>
+      <h2>The voice layer for the built world.</h2>
+      <p class="body">
+        Crew Voice turns the glasses into a coordination layer for the whole crew — hands-free,
+        eyes-up, always on. Talk to your team and to ALLERION.ai on the same channel, and
+        watch the conversation turn into documentation on its own.
+      </p>
+      <div class="placeholder">
+        <strong>PLACEHOLDER COPY — REPLACE</strong><br />
+        This describes Crew Voice as a best guess. You flagged that your real concept is
+        different — drop your own one-paragraph definition here and this section gets rewritten
+        around it.
+      </div>
+    </div>
+  </section>
+
+  <section>
+    <div class="wrap">
+      <div class="eyebrow">How we ship</div>
+      <h2>Buy the hardware. Own the intelligence.</h2>
+      <div class="phase">
+        <span class="num">01</span>
+        <div>
+          <h3>Phase 1 — Voice-first, available now</h3>
+          <p>White-label a discreet, already-certified, camera-free safety frame and brand it
+          Allerion. Deploy ALLERION.ai + Crew Voice. No camera means no privacy blocker and no
+          re-certification — it ships.</p>
+        </div>
+      </div>
+      <div class="phase">
+        <span class="num">02</span>
+        <div>
+          <h3>Phase 2 — Camera SKU for documentation</h3>
+          <p>For sites that want POV video → auto-generated SOPs, an optional camera-equipped
+          certified model, with consent and on-prem storage built in. Same ALLERION.ai backend.</p>
+        </div>
+      </div>
+      <div class="certs">
+        <span class="cert">ANSI Z87.1</span>
+        <span class="cert">CSA Z94.3</span>
+        <span class="cert">EN 166</span>
+        <span class="cert">SOVEREIGN / ON-PREM</span>
+      </div>
+    </div>
+  </section>
+
+  <section id="signup">
+    <div class="wrap">
+      <div class="eyebrow">Early access</div>
+      <h2>Put Allerion on your crew first.</h2>
+      <p class="body" style="margin: 0 auto;">
+        We're onboarding a small group of design-partner sites. Tell us where you operate and
+        we'll be in touch.
+      </p>
+      <!-- TODO: wire to a real backend (Formspree, Netlify Forms, or ALLERION.ai endpoint). -->
+      <form action="#" method="POST" onsubmit="event.preventDefault(); this.style.display='none'; document.getElementById('thanks').style.display='block';">
+        <input type="email" name="email" placeholder="you@company.com" required />
+        <button type="submit">Request access</button>
+      </form>
+      <p id="thanks" class="fineprint" style="display:none;">Thanks — we'll reach out. (Form not yet wired to a backend.)</p>
+      <p class="fineprint">B2B / design-partner program. No spam.</p>
+    </div>
+  </section>
+
+  <footer>
+    <div class="logo">_/\_</div>
+    <div>Allerion Systems — Autonomous intelligence for the built world.</div>
+    <div class="quote">"We don't sell software. We deploy intelligence."</div>
+  </footer>
+
+</body>
+</html>
