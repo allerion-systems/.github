@@ -3,193 +3,48 @@
 <head>
 <meta charset="UTF-8" />
 <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-<title>Allerion Glasses — Autonomous intelligence for the built world</title>
-<meta name="description" content="Certified safety glasses, rebranded Allerion, running ALLERION.ai and Crew Voice. Hands-free intelligence for the shop floor and the job site." />
+<title>CrewVoice by Allerion — your voice, every worker's language</title>
+<meta name="description" content="A contractor records their voice once, then sends messages as a voicemail or text in the recipient's language — in their own cloned voice. Built for construction. Ships as an MCP server for ChatGPT and Claude." />
 <style>
   :root {
-    --bg: #0a0a0b;
-    --panel: #121214;
-    --line: #232327;
-    --fg: #ededf0;
-    --muted: #8a8a93;
-    --accent: #e8e8ea;
-    --hi: #6ee7b7;
+    --bg: #0a0a0b; --panel: #121214; --line: #232327; --fg: #ededf0;
+    --muted: #8a8a93; --hi: #6ee7b7;
     --mono: ui-monospace, SFMono-Regular, Menlo, Consolas, monospace;
     --sans: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, Helvetica, Arial, sans-serif;
   }
   * { box-sizing: border-box; margin: 0; padding: 0; }
   html { scroll-behavior: smooth; }
-  body {
-    background: var(--bg);
-    color: var(--fg);
-    font-family: var(--sans);
-    line-height: 1.6;
-    -webkit-font-smoothing: antialiased;
-  }
+  body { background: var(--bg); color: var(--fg); font-family: var(--sans); line-height: 1.6; -webkit-font-smoothing: antialiased; }
   .wrap { max-width: 920px; margin: 0 auto; padding: 0 24px; }
-  a { color: inherit; }
 
-  /* Hero */
-  header.hero {
-    text-align: center;
-    padding: 120px 24px 80px;
-    border-bottom: 1px solid var(--line);
-  }
-  .logo {
-    font-family: var(--mono);
-    font-size: 28px;
-    letter-spacing: 2px;
-    color: var(--muted);
-    margin-bottom: 28px;
-  }
-  .hero h1 {
-    font-size: clamp(32px, 6vw, 56px);
-    font-weight: 700;
-    letter-spacing: -0.02em;
-    line-height: 1.08;
-    margin-bottom: 20px;
-  }
-  .hero p.lede {
-    font-size: clamp(16px, 2.4vw, 20px);
-    color: var(--muted);
-    max-width: 620px;
-    margin: 0 auto 36px;
-  }
-  .cta {
-    display: inline-block;
-    background: var(--fg);
-    color: var(--bg);
-    font-weight: 600;
-    padding: 14px 28px;
-    border-radius: 8px;
-    text-decoration: none;
-    transition: transform .12s ease, opacity .12s ease;
-  }
+  header.hero { text-align: center; padding: 110px 24px 76px; border-bottom: 1px solid var(--line); }
+  .logo { font-family: var(--mono); font-size: 26px; letter-spacing: 2px; color: var(--muted); margin-bottom: 22px; }
+  .eyebrow { font-family: var(--mono); font-size: 12px; letter-spacing: 2px; text-transform: uppercase; color: var(--hi); margin-bottom: 18px; }
+  .hero h1 { font-size: clamp(30px, 5.5vw, 52px); font-weight: 700; letter-spacing: -0.02em; line-height: 1.08; margin-bottom: 20px; }
+  .hero p.lede { font-size: clamp(16px, 2.2vw, 19px); color: var(--muted); max-width: 660px; margin: 0 auto 34px; }
+  .cta { display: inline-block; background: var(--fg); color: var(--bg); font-weight: 600; padding: 14px 26px; border-radius: 8px; text-decoration: none; transition: transform .12s ease, opacity .12s ease; }
   .cta:hover { transform: translateY(-1px); opacity: .9; }
-  .cta.secondary {
-    background: transparent;
-    color: var(--fg);
-    border: 1px solid var(--line);
-    margin-left: 10px;
-  }
+  .cta.secondary { background: transparent; color: var(--fg); border: 1px solid var(--line); margin-left: 10px; }
+  .pricing { color: var(--muted); font-size: 14px; margin-top: 18px; }
 
-  /* Sections */
-  section { padding: 72px 0; border-bottom: 1px solid var(--line); }
-  .eyebrow {
-    font-family: var(--mono);
-    font-size: 12px;
-    letter-spacing: 2px;
-    text-transform: uppercase;
-    color: var(--hi);
-    margin-bottom: 14px;
-  }
-  h2 { font-size: clamp(24px, 4vw, 34px); letter-spacing: -0.01em; margin-bottom: 16px; }
+  section { padding: 70px 0; border-bottom: 1px solid var(--line); }
+  h2 { font-size: clamp(22px, 4vw, 30px); letter-spacing: -0.01em; margin-bottom: 14px; }
   p.body { color: var(--muted); max-width: 660px; }
-
-  .grid {
-    display: grid;
-    grid-template-columns: repeat(auto-fit, minmax(240px, 1fr));
-    gap: 18px;
-    margin-top: 36px;
-  }
-  .card {
-    background: var(--panel);
-    border: 1px solid var(--line);
-    border-radius: 12px;
-    padding: 24px;
-  }
+  .grid { display: grid; grid-template-columns: repeat(auto-fit, minmax(250px, 1fr)); gap: 18px; margin-top: 34px; }
+  .card { background: var(--panel); border: 1px solid var(--line); border-radius: 12px; padding: 24px; }
+  .card .tag { font-family: var(--mono); font-size: 11px; letter-spacing: 1px; color: var(--hi); text-transform: uppercase; display: block; margin-bottom: 12px; }
   .card h3 { font-size: 18px; margin-bottom: 8px; }
   .card p { color: var(--muted); font-size: 15px; }
-  .card .tag {
-    font-family: var(--mono);
-    font-size: 11px;
-    letter-spacing: 1px;
-    color: var(--hi);
-    text-transform: uppercase;
-    display: block;
-    margin-bottom: 12px;
-  }
 
-  /* Phases */
-  .phase { display: flex; gap: 20px; align-items: flex-start; padding: 22px 0; border-top: 1px solid var(--line); }
-  .phase:first-of-type { border-top: none; }
-  .phase .num {
-    font-family: var(--mono);
-    font-size: 13px;
-    color: var(--bg);
-    background: var(--hi);
-    border-radius: 6px;
-    padding: 4px 9px;
-    flex: 0 0 auto;
-    font-weight: 700;
-  }
-  .phase h3 { font-size: 19px; margin-bottom: 6px; }
-  .phase p { color: var(--muted); font-size: 15px; }
+  .usecases { display: flex; gap: 18px; flex-wrap: wrap; margin-top: 28px; }
+  .usecase { flex: 1 1 280px; border-left: 2px solid var(--hi); padding-left: 16px; }
+  .usecase h3 { font-size: 16px; margin-bottom: 4px; }
+  .usecase p { color: var(--muted); font-size: 14px; }
 
-  .placeholder {
-    border: 1px dashed #3a3a40;
-    background: rgba(110,231,183,0.04);
-    border-radius: 10px;
-    padding: 16px 18px;
-    margin-top: 20px;
-    font-size: 14px;
-    color: var(--muted);
-  }
-  .placeholder strong { color: var(--hi); font-family: var(--mono); font-size: 12px; letter-spacing: 1px; }
-
-  /* Certification strip */
-  .certs { display: flex; flex-wrap: wrap; gap: 12px; margin-top: 28px; }
-  .cert {
-    font-family: var(--mono);
-    font-size: 12px;
-    letter-spacing: 1px;
-    color: var(--muted);
-    border: 1px solid var(--line);
-    border-radius: 999px;
-    padding: 7px 16px;
-  }
-
-  /* Signup */
-  #signup { text-align: center; }
-  form {
-    display: flex;
-    gap: 10px;
-    max-width: 480px;
-    margin: 28px auto 12px;
-    flex-wrap: wrap;
-    justify-content: center;
-  }
-  input[type="email"] {
-    flex: 1 1 240px;
-    background: var(--panel);
-    border: 1px solid var(--line);
-    border-radius: 8px;
-    color: var(--fg);
-    padding: 14px 16px;
-    font-size: 15px;
-    font-family: var(--sans);
-  }
-  input[type="email"]:focus { outline: none; border-color: var(--hi); }
-  button[type="submit"] {
-    background: var(--fg);
-    color: var(--bg);
-    border: none;
-    border-radius: 8px;
-    padding: 14px 24px;
-    font-weight: 600;
-    font-size: 15px;
-    cursor: pointer;
-  }
-  .fineprint { color: var(--muted); font-size: 13px; }
-
-  footer {
-    text-align: center;
-    padding: 48px 24px 64px;
-    color: var(--muted);
-    font-size: 13px;
-  }
-  footer .logo { font-size: 18px; margin-bottom: 16px; }
-  .quote { color: var(--accent); font-style: italic; margin-top: 8px; }
+  #cta { text-align: center; }
+  footer { text-align: center; padding: 46px 24px 64px; color: var(--muted); font-size: 13px; }
+  footer .logo { font-size: 18px; margin-bottom: 14px; }
+  .quote { color: var(--fg); font-style: italic; margin-top: 8px; }
 </style>
 </head>
 <body>
@@ -197,42 +52,38 @@
   <header class="hero">
     <div class="wrap">
       <div class="logo">_/\_</div>
-      <h1>Your voice. Their language. Hands-free.</h1>
+      <div class="eyebrow">Now in early access · Allerion Apps</div>
+      <h1>CrewVoice — your voice, every worker's language.</h1>
       <p class="lede">
-        Certified safety glasses, rebranded Allerion, running <strong>CrewVoice</strong> — the
-        vertical AI agent for construction crews. Speak a dispatch in English; your crew hears it
-        in Spanish, in <em>your</em> voice, in their own ears. No phone. No stopping work.
+        A contractor records their voice once. Then they type a message in English, pick a
+        crew or a customer, and CrewVoice sends it as a voicemail or text in the recipient's
+        language — Spanish, English, more — in the contractor's own cloned voice. Built for
+        construction. Ships as an MCP server, so it plugs straight into the ChatGPT or Claude
+        you already use.
       </p>
-      <a class="cta" href="#signup">Become a design partner</a>
-      <a class="cta secondary" href="#how">How it works</a>
+      <a class="cta" href="#cta">Get CrewVoice — $149/mo</a>
+      <a class="cta secondary" href="#cta">Book a demo</a>
+      <div class="pricing">This is the contractor version of the voice-clone voicemail model already proven for real-estate agents.</div>
     </div>
   </header>
 
-  <section id="how">
+  <section>
     <div class="wrap">
-      <div class="eyebrow">The idea</div>
-      <h2>Eye protection your crew already has to wear — now it thinks.</h2>
-      <p class="body">
-        Frontline crews already wear safety glasses by law. We start there: a discreet,
-        already-certified frame, rebranded Allerion, with ALLERION.ai and Crew Voice running
-        on it. No new gadget to justify, no certification to wait on — intelligence on the
-        protection they're already required to wear.
-      </p>
       <div class="grid">
         <div class="card">
-          <span class="tag">Your cloned voice</span>
-          <h3>Delivered as you</h3>
-          <p>A 30-second sample, and CrewVoice speaks any language in your own voice. Your crew hears their boss — not a robot.</p>
+          <span class="tag">Clone once</span>
+          <h3>Clone your voice</h3>
+          <p>Record a short sample and CrewVoice captures your voice. Every message after that goes out sounding like you — no re-recording, no studio.</p>
         </div>
         <div class="card">
-          <span class="tag">Two-way</span>
-          <h3>They answer, you understand</h3>
-          <p>Crew replies in Spanish; you get it in English. The language barrier on the job site, gone.</p>
+          <span class="tag">Translate + send</span>
+          <h3>In their language</h3>
+          <p>Type in English. CrewVoice translates and delivers a voicemail or text in the recipient's language — Spanish, English, and more — in your cloned voice.</p>
         </div>
         <div class="card">
-          <span class="tag">Built for construction</span>
-          <h3>Speaks the trade</h3>
-          <p>TPO, flashing, drip edge, underlayment — CrewVoice knows the terms generic translators butcher.</p>
+          <span class="tag">MCP</span>
+          <h3>Works in your existing AI</h3>
+          <p>Ships as an MCP server. Plug it into the ChatGPT or Claude you already use and send crew dispatches and bid follow-ups straight from chat.</p>
         </div>
       </div>
     </div>
@@ -240,80 +91,28 @@
 
   <section>
     <div class="wrap">
-      <div class="eyebrow">CrewVoice</div>
-      <h2>The vertical AI agent for construction crews.</h2>
-      <p class="body">
-        The language barrier between English-speaking contractors and Spanish-speaking crews
-        costs the industry billions in rework, injuries, and lost time. CrewVoice closes it —
-        not with text translation, but by delivering your dispatches in your crew's language,
-        spoken in your own cloned voice. On the Allerion glasses, it's hands-free and eyes-up:
-        the job site can finally hear you, in any language, without anyone reaching for a phone.
-      </p>
-      <div class="grid">
-        <div class="card">
-          <span class="tag">Dispatch</span>
-          <h3>Speak once, sent in their language</h3>
-          <p>"Start the south elevation, underlayment down before noon" → delivered as a voice note in Spanish, in your voice.</p>
+      <h2>Built for the job site.</h2>
+      <p class="body">The language barrier between English-speaking contractors and their crews and customers costs the industry billions in rework and lost deals. CrewVoice closes it — in the voice everyone already knows.</p>
+      <div class="usecases">
+        <div class="usecase">
+          <h3>Dispatch the crew</h3>
+          <p>Send a job to a Spanish-speaking crew as a voice note — in your voice, so it carries your authority.</p>
         </div>
-        <div class="card">
-          <span class="tag">Safety briefing</span>
-          <h3>6 AM, every morning, automatically</h3>
-          <p>Each crew member gets the daily safety briefing in their language, in the superintendent's voice.</p>
-        </div>
-        <div class="card">
-          <span class="tag">Documentation</span>
-          <h3>End-of-day record</h3>
-          <p>Every communication, transcribed and summarized — what was said, to whom, and when.</p>
+        <div class="usecase">
+          <h3>Follow up the bid</h3>
+          <p>Reach a homeowner who doesn't speak English, in their language, without an interpreter or a callback you'll miss.</p>
         </div>
       </div>
     </div>
   </section>
 
-  <section>
+  <section id="cta">
     <div class="wrap">
-      <div class="eyebrow">How we ship</div>
-      <h2>Buy the hardware. Own the intelligence.</h2>
-      <div class="phase">
-        <span class="num">01</span>
-        <div>
-          <h3>Phase 1 — Voice-first, available now</h3>
-          <p>White-label a discreet, already-certified, camera-free safety frame and brand it
-          Allerion. Deploy ALLERION.ai + Crew Voice. No camera means no privacy blocker and no
-          re-certification — it ships.</p>
-        </div>
-      </div>
-      <div class="phase">
-        <span class="num">02</span>
-        <div>
-          <h3>Phase 2 — Camera SKU for documentation</h3>
-          <p>For sites that want POV video → auto-generated SOPs, an optional camera-equipped
-          certified model, with consent and on-prem storage built in. Same ALLERION.ai backend.</p>
-        </div>
-      </div>
-      <div class="certs">
-        <span class="cert">ANSI Z87.1</span>
-        <span class="cert">CSA Z94.3</span>
-        <span class="cert">EN 166</span>
-        <span class="cert">SOVEREIGN / ON-PREM</span>
-      </div>
-    </div>
-  </section>
-
-  <section id="signup">
-    <div class="wrap">
-      <div class="eyebrow">Early access</div>
-      <h2>Put Allerion on your crew first.</h2>
-      <p class="body" style="margin: 0 auto;">
-        We're onboarding a small group of design-partner sites. Tell us where you operate and
-        we'll be in touch.
-      </p>
-      <!-- TODO: wire to a real backend (Formspree, Netlify Forms, or ALLERION.ai endpoint). -->
-      <form action="#" method="POST" onsubmit="event.preventDefault(); this.style.display='none'; document.getElementById('thanks').style.display='block';">
-        <input type="email" name="email" placeholder="you@company.com" required />
-        <button type="submit">Request access</button>
-      </form>
-      <p id="thanks" class="fineprint" style="display:none;">Thanks — we'll reach out. (Form not yet wired to a backend.)</p>
-      <p class="fineprint">B2B / design-partner program. No spam.</p>
+      <div class="eyebrow">CrewVoice by Allerion</div>
+      <h2>$149/mo · early access</h2>
+      <p class="body" style="margin: 0 auto 28px;">Voicemail, text, and an MCP server for ChatGPT and Claude.</p>
+      <a class="cta" href="mailto:info@allerion.io?subject=CrewVoice%20early%20access">Get CrewVoice — $149/mo</a>
+      <a class="cta secondary" href="mailto:info@allerion.io?subject=Book%20a%20CrewVoice%20demo">Book a demo</a>
     </div>
   </section>
 
