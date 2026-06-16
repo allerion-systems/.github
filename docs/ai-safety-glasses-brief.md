@@ -103,7 +103,60 @@ start, independent of hardware timelines.
 | 4 | ODM hardware shortlist + sample units | Cheapest path to a wearable demo |
 | 5 | Privacy/consent + data-governance design | Gating requirement for industrial deployment |
 
-## 8. Open questions for the founder
+## 8. Hardware sourcing — what already exists (don't build from scratch)
+
+The instinct "find safety glasses that are already designed and tested, then just add the
+camera" is correct in spirit. The market splits into two camps, and the gap is the space
+between them:
+
+### Camp A — camera + safety rating already exists (but bulky / industrial-looking)
+| Product | Certification | Camera | Form factor |
+|---------|--------------|--------|-------------|
+| **Vuzix Blade 2** | ANSI Z87.1 | Autofocus HD camera | Chunky AR glasses |
+| **RealWear Navigator Z1** | Rugged / worn with PPE | HD camera | Headset-style HMD |
+| **Iristick G2** | Certified PPE, ATEX (explosive atmospheres) | Camera | Industrial, dual-screen |
+
+**Implication:** "first to market with a camera safety wearable" is already gone for the
+rugged HMD form factor. We don't beat these on industrial AR.
+
+### Camp B — discreet, all-day, certified safety glasses (but camera deliberately removed)
+| Product | Certification | Camera | Why no camera |
+|---------|--------------|--------|---------------|
+| **Lucyd Armor** | ANSI Z87.1+, CSA Z94.3, EN 16639:2018 | **None — by choice** | Privacy concerns; launched camera-free at CES 2026 |
+
+Lucyd Armor is exactly the discreet, glasses-like, 8-hour, certified frame the original
+reviewer wanted — audio + AI (ChatGPT) + photochromic lenses — but they **intentionally
+omit the camera** for workplace-privacy reasons.
+
+### The actual open gap
+**Discreet, all-day-wearable, Z87.1-certified glasses WITH a camera, feeding an AI
+SOP/operations pipeline.** Nobody combines all three: the camera players are bulky, and the
+discreet-safety players dropped the camera on purpose.
+
+### ⚠️ The catch with "just add the camera"
+ANSI Z87.1 certifies the **complete assembled product as tested**. Bolting an aftermarket
+camera onto certified frames generally **voids the certification** — it changes mass,
+balance, and structural integrity, and the unit was never impact-tested in that
+configuration. So "add a camera" does not dodge certification; it **relocates** it: you
+re-certify the integrated camera-glasses unit.
+
+Good news: starting from a proven certified frame (validated lens geometry and materials)
+substantially de-risks and shortens re-certification versus designing optics from zero.
+
+### Recommended sourcing paths (fastest → slowest)
+1. **Partner / license with a discreet Z87.1 frame maker** (e.g. Lucyd/Innovative Eyewear,
+   or a frame ODM such as Bollé Safety, Uvex, Oakley SI) → integrate a camera module →
+   re-certify the assembled unit. Closes the exact gap above.
+2. **License an existing camera platform** (Vuzix licenses its tech; Iristick for
+   hazardous/ATEX environments) when industrial-grade or explosive-atmosphere rating matters
+   more than discreet styling.
+3. **Full ODM camera-glasses from Shenzhen** + first-time Z87.1/EN 166 certification — most
+   control, slowest, highest cost. Only if 1 and 2 can't deliver the form factor.
+
+The privacy tension Lucyd designed around (always-on cameras in workplaces) is real and must
+be engineered in: hardware recording indicator, on-prem/sovereign storage, retention policy.
+
+## 9. Open questions for the founder
 
 - Standalone product line, or an accessory/front-end to the existing Allerion platform? (Recommend: the latter.)
 - Geography for first certification — US (Z87.1) or EU (EN 166)?
