@@ -1,0 +1,25 @@
+{
+  "name": "crewvoice",
+  "version": "0.1.0",
+  "private": true,
+  "description": "CrewVoice — the vertical AI agent for construction crews. Speak a dispatch in English; your crew hears it in their language, in your cloned voice.",
+  "type": "module",
+  "main": "server.js",
+  "scripts": {
+    "start": "node server.js",
+    "dev": "node --watch server.js",
+    "mcp": "node mcp-server.js"
+  },
+  "engines": {
+    "node": ">=18"
+  },
+  "dependencies": {
+    "@anthropic-ai/sdk": "^0.69.0",
+    "@modelcontextprotocol/sdk": "^1.13.0",
+    "dotenv": "^16.4.5",
+    "express": "^4.21.2",
+    "multer": "^1.4.5-lts.1",
+    "twilio": "^5.3.0",
+    "zod": "^3.23.8"
+  }
+}

@@ -1,0 +1,231 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8" />
+<meta name="viewport" content="width=device-width, initial-scale=1.0" />
+<title>CrewVoice — your voice, their language</title>
+<style>
+  :root {
+    --bg: #0a0a0b; --panel: #141416; --line: #26262b; --fg: #ededf0;
+    --muted: #8a8a93; --hi: #6ee7b7; --warn: #f0a868;
+    --sans: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, Helvetica, Arial, sans-serif;
+    --mono: ui-monospace, SFMono-Regular, Menlo, Consolas, monospace;
+  }
+  * { box-sizing: border-box; margin: 0; padding: 0; }
+  body { background: var(--bg); color: var(--fg); font-family: var(--sans); line-height: 1.5; }
+  .wrap { max-width: 680px; margin: 0 auto; padding: 40px 24px 80px; }
+  .logo { font-family: var(--mono); color: var(--muted); letter-spacing: 2px; }
+  h1 { font-size: 30px; letter-spacing: -0.02em; margin: 14px 0 6px; }
+  .lede { color: var(--muted); margin-bottom: 8px; }
+  .step { background: var(--panel); border: 1px solid var(--line); border-radius: 14px; padding: 22px; margin-top: 20px; }
+  .step h2 { font-size: 17px; margin-bottom: 4px; }
+  .step .num { font-family: var(--mono); color: var(--hi); font-size: 12px; letter-spacing: 1px; }
+  .step p.hint { color: var(--muted); font-size: 14px; margin-bottom: 14px; }
+  label { display: block; font-size: 13px; color: var(--muted); margin: 12px 0 6px; }
+  textarea, select {
+    width: 100%; background: #0e0e10; border: 1px solid var(--line); border-radius: 9px;
+    color: var(--fg); padding: 12px; font-size: 15px; font-family: var(--sans);
+  }
+  textarea:focus, select:focus { outline: none; border-color: var(--hi); }
+  textarea { resize: vertical; min-height: 80px; }
+  button {
+    background: var(--fg); color: var(--bg); border: none; border-radius: 9px;
+    padding: 12px 20px; font-weight: 600; font-size: 15px; cursor: pointer; margin-top: 6px;
+  }
+  button.ghost { background: transparent; color: var(--fg); border: 1px solid var(--line); }
+  button:disabled { opacity: 0.45; cursor: not-allowed; }
+  .row { display: flex; gap: 10px; flex-wrap: wrap; align-items: center; }
+  .status { font-size: 13px; color: var(--muted); margin-top: 10px; min-height: 18px; }
+  .status.ok { color: var(--hi); }
+  .status.err { color: var(--warn); }
+  .result { margin-top: 14px; padding: 14px; background: #0e0e10; border: 1px solid var(--line); border-radius: 9px; display: none; }
+  .result .label { font-family: var(--mono); font-size: 11px; letter-spacing: 1px; color: var(--hi); text-transform: uppercase; }
+  .result .text { font-size: 18px; margin: 8px 0 12px; }
+  audio { width: 100%; }
+  .rec-dot { width: 10px; height: 10px; border-radius: 50%; background: #e0564b; display: inline-block; animation: pulse 1s infinite; }
+  @keyframes pulse { 0%,100% { opacity: 1; } 50% { opacity: 0.3; } }
+  .disabled-veil { opacity: 0.4; pointer-events: none; }
+</style>
+</head>
+<body>
+<div class="wrap">
+  <div class="logo">_/\_ CREWVOICE</div>
+  <h1>Your voice. Their language.</h1>
+  <p class="lede">Speak a dispatch in English. Your crew hears it in their language — in your own cloned voice.</p>
+
+  <!-- Step 1: clone -->
+  <section class="step" id="step-clone">
+    <span class="num">STEP 1</span>
+    <h2>Clone your voice</h2>
+    <p class="hint">Record ~30 seconds of yourself talking — anything. CrewVoice learns your voice once.</p>
+    <div class="row">
+      <button id="recordSampleBtn">● Record sample</button>
+      <button id="stopSampleBtn" class="ghost" disabled>Stop</button>
+      <span id="sampleTimer" class="status"></span>
+    </div>
+    <div class="status" id="cloneStatus"></div>
+  </section>
+
+  <!-- Step 2: dispatch -->
+  <section class="step disabled-veil" id="step-dispatch">
+    <span class="num">STEP 2</span>
+    <h2>Send a dispatch</h2>
+    <p class="hint">Type what you'd tell the crew. It comes back as a voice note in their language, in your voice.</p>
+    <label for="message">Message (English)</label>
+    <textarea id="message" placeholder="Start the south elevation today. I need the underlayment down before noon. Watch the skylight penetrations."></textarea>
+    <label for="lang">Crew's language</label>
+    <select id="lang">
+      <option>Spanish</option>
+      <option>Portuguese</option>
+      <option>Haitian Creole</option>
+      <option>Polish</option>
+      <option>Vietnamese</option>
+      <option>Mandarin Chinese</option>
+    </select>
+    <button id="dispatchBtn">Send dispatch →</button>
+    <div class="status" id="dispatchStatus"></div>
+    <div class="result" id="dispatchResult">
+      <span class="label">Delivered in your voice</span>
+      <div class="text" id="translationText"></div>
+      <audio id="dispatchAudio" controls></audio>
+    </div>
+  </section>
+
+  <!-- Step 3: two-way -->
+  <section class="step" id="step-reply">
+    <span class="num">STEP 3 · TWO-WAY</span>
+    <h2>Hear back from the crew</h2>
+    <p class="hint">Record a reply in any language. You get it back in English.</p>
+    <div class="row">
+      <button id="recordReplyBtn">● Record reply</button>
+      <button id="stopReplyBtn" class="ghost" disabled>Stop</button>
+      <span id="replyTimer" class="status"></span>
+    </div>
+    <div class="status" id="replyStatus"></div>
+    <div class="result" id="replyResult">
+      <span class="label">In English</span>
+      <div class="text" id="englishText"></div>
+      <div class="status" id="originalText"></div>
+    </div>
+  </section>
+</div>
+
+<script>
+let voiceId = null;
+
+function recorderFor(onComplete) {
+  let mediaRecorder, chunks = [], timer, seconds = 0;
+  return {
+    async start(timerEl) {
+      const stream = await navigator.mediaDevices.getUserMedia({ audio: true });
+      mediaRecorder = new MediaRecorder(stream);
+      chunks = [];
+      mediaRecorder.ondataavailable = (e) => chunks.push(e.data);
+      mediaRecorder.onstop = () => {
+        stream.getTracks().forEach((t) => t.stop());
+        clearInterval(timer);
+        if (timerEl) timerEl.textContent = "";
+        onComplete(new Blob(chunks, { type: "audio/webm" }));
+      };
+      mediaRecorder.start();
+      seconds = 0;
+      timer = setInterval(() => {
+        seconds++;
+        if (timerEl) timerEl.innerHTML = `<span class="rec-dot"></span> ${seconds}s`;
+      }, 1000);
+    },
+    stop() { if (mediaRecorder && mediaRecorder.state !== "inactive") mediaRecorder.stop(); },
+  };
+}
+
+function setStatus(el, msg, kind) {
+  el.textContent = msg;
+  el.className = "status" + (kind ? " " + kind : "");
+}
+
+// --- Step 1: clone ---
+const cloneStatus = document.getElementById("cloneStatus");
+const sampleRec = recorderFor(async (blob) => {
+  setStatus(cloneStatus, "Cloning your voice…");
+  const fd = new FormData();
+  fd.append("sample", blob, "sample.webm");
+  try {
+    const res = await fetch("/api/clone", { method: "POST", body: fd });
+    const data = await res.json();
+    if (!res.ok) throw new Error(data.error || "Clone failed");
+    voiceId = data.voiceId;
+    setStatus(cloneStatus, "✓ Voice cloned. Now send a dispatch.", "ok");
+    document.getElementById("step-dispatch").classList.remove("disabled-veil");
+  } catch (e) {
+    setStatus(cloneStatus, e.message, "err");
+  }
+});
+document.getElementById("recordSampleBtn").onclick = () => {
+  sampleRec.start(document.getElementById("sampleTimer"));
+  document.getElementById("recordSampleBtn").disabled = true;
+  document.getElementById("stopSampleBtn").disabled = false;
+};
+document.getElementById("stopSampleBtn").onclick = () => {
+  sampleRec.stop();
+  document.getElementById("recordSampleBtn").disabled = false;
+  document.getElementById("stopSampleBtn").disabled = true;
+};
+
+// --- Step 2: dispatch ---
+const dispatchStatus = document.getElementById("dispatchStatus");
+document.getElementById("dispatchBtn").onclick = async () => {
+  const text = document.getElementById("message").value.trim();
+  const targetLanguage = document.getElementById("lang").value;
+  if (!voiceId) return setStatus(dispatchStatus, "Clone your voice first (step 1).", "err");
+  if (!text) return setStatus(dispatchStatus, "Type a message first.", "err");
+  setStatus(dispatchStatus, "Translating and speaking in your voice…");
+  try {
+    const res = await fetch("/api/dispatch", {
+      method: "POST",
+      headers: { "Content-Type": "application/json" },
+      body: JSON.stringify({ text, targetLanguage, voiceId }),
+    });
+    const data = await res.json();
+    if (!res.ok) throw new Error(data.error || "Dispatch failed");
+    document.getElementById("translationText").textContent = data.translation;
+    document.getElementById("dispatchAudio").src = `data:${data.mimeType};base64,${data.audio}`;
+    document.getElementById("dispatchResult").style.display = "block";
+    setStatus(dispatchStatus, "✓ Sent.", "ok");
+    document.getElementById("dispatchAudio").play().catch(() => {});
+  } catch (e) {
+    setStatus(dispatchStatus, e.message, "err");
+  }
+};
+
+// --- Step 3: two-way ---
+const replyStatus = document.getElementById("replyStatus");
+const replyRec = recorderFor(async (blob) => {
+  setStatus(replyStatus, "Transcribing and translating to English…");
+  const fd = new FormData();
+  fd.append("reply", blob, "reply.webm");
+  try {
+    const res = await fetch("/api/transcribe", { method: "POST", body: fd });
+    const data = await res.json();
+    if (!res.ok) throw new Error(data.error || "Transcribe failed");
+    document.getElementById("englishText").textContent = data.english;
+    document.getElementById("originalText").textContent =
+      `Original (${data.languageCode || "detected"}): ${data.original}`;
+    document.getElementById("replyResult").style.display = "block";
+    setStatus(replyStatus, "✓ Translated.", "ok");
+  } catch (e) {
+    setStatus(replyStatus, e.message, "err");
+  }
+});
+document.getElementById("recordReplyBtn").onclick = () => {
+  replyRec.start(document.getElementById("replyTimer"));
+  document.getElementById("recordReplyBtn").disabled = true;
+  document.getElementById("stopReplyBtn").disabled = false;
+};
+document.getElementById("stopReplyBtn").onclick = () => {
+  replyRec.stop();
+  document.getElementById("recordReplyBtn").disabled = false;
+  document.getElementById("stopReplyBtn").disabled = true;
+};
+</script>
+</body>
+</html>
