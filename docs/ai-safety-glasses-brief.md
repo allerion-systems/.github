@@ -109,34 +109,43 @@ SOP pipeline (§6) plugs into the same ALLERION.ai backend.
 This is squarely buildable today with current models and is the highest-leverage place to
 start, independent of hardware timelines.
 
-## 6a. Crew Voice — the voice-first layer (Phase 1 hero feature)
+## 6a. CrewVoice — the Phase 1 hero (already built at allerion.io)
 
-> *Founder's concept — definition below is a working interpretation; needs confirmation.*
+**CrewVoice is the vertical AI agent for construction crews.** It solves the English ↔
+Spanish language barrier that costs the industry billions in rework, injuries, and lost
+productivity — not with text translation, but by delivering a contractor's dispatches in the
+crew's language, **spoken in the contractor's own cloned voice.**
 
-**Crew Voice** is the always-available, hands-free voice layer that runs on the Allerion
-glasses and connects every crew member to each other and to ALLERION.ai. It's the feature
-that works on a camera-free frame, so it ships in Phase 1.
+The moat is precisely that voice cloning: when a crew member hears *their boss's actual
+voice* — in Spanish — telling them what to do, that's trust and authority no text-translation
+app (MindForge, Projul, Google Translate) or expensive human interpreter (Boostlingo) can
+replicate. It needs no hardware (works on any phone via WhatsApp/SMS), and it understands the
+trade ("TPO," "flashing," "drip edge," "underlayment").
 
-Working interpretation of the capability set:
-- **Crew-to-crew comms** — push-to-talk / VOIP channels across a site (the base hardware
-  already has walkie-talkie VOIP), but routed through ALLERION.ai so it's more than a radio.
-- **Hands-free commands** — "Allerion, log a material request for rebar at gridline 4",
-  "start an inspection", "what's the torque spec for this joint?" — voice in, answer or action out.
-- **Voice-logged field notes** → automatically transcribed, structured, and written back to
-  SOPs / ERP / the digital twin. Captures the "pulled in four directions" reality the original
-  reviewer described, with no hands and no phone.
-- **Agent-mediated coordination** — ALLERION.ai sits on the channel: summarizing, routing
-  requests, surfacing the right spec or drawing, escalating to a remote expert.
-- **Sovereign/on-prem voice** — speech processing on private infrastructure for sites that
-  can't send audio to the cloud (ties to the existing Sovereign AI capability).
+### Agent architecture (chained, single-purpose agents)
+1. **Voice Cloner** — 30-sec sample → a voice model that speaks any language as that person.
+2. **Dispatcher** — contractor speaks English → delivered as a Spanish voice note in their voice.
+3. **Translator (two-way)** — crew replies in Spanish → contractor receives English.
+4. **Safety Agent** (premium) — daily briefing pushed to each crew member at 6 AM, in their
+   language, in the superintendent's voice.
+5. **Documentation Agent** (enterprise) — end-of-day record of what was communicated, to whom, when.
 
-Why it's the right Phase 1 hero: it delivers daily value with **no camera, no re-cert, no
-privacy blocker**, and it's the natural front-end to the agent stack Allerion already builds.
+### Pricing (SaaS, already modeled)
+| Tier | Price/mo | Includes |
+|------|----------|----------|
+| Starter | $149 | 1 voice clone, 100 dispatches, EN→ES |
+| Pro | $299 | 3 clones, unlimited dispatches, two-way, 5 languages |
+| Enterprise | $499 | Unlimited clones, safety briefings, documentation, API |
 
-**Questions to pin down crew voice (need founder input):**
-- Is it primarily **crew↔crew comms**, **crew↔AI assistant**, or both equally?
-- Real-time coordination, or async capture-and-structure, or both?
-- Does it need to work offline / fully on-prem from day one?
+### Why the glasses matter to CrewVoice
+CrewVoice already works on a phone — but a phone means a crew member stops, pulls it out, and
+looks down. **On the Allerion glasses, CrewVoice becomes hands-free and eyes-up:** the
+contractor speaks a dispatch and the crew hears it, in their language, in their own ears,
+while their hands stay on the work and their eyes stay on the hazard. The glasses are the
+premium delivery layer for a product that already exists — not a new product to invent.
+
+This is the connective tissue: **CrewVoice (software, built) × Allerion glasses (certified
+hardware, white-labeled) = a hands-free bilingual job site.**
 
 ## 7. Proposed first milestones
 
