@@ -143,10 +143,12 @@ def record_unmapped(conn, row):
 
 
 def emit(customer_id, value_usd, request_id):
+    # 12 decimals so sub-micro-dollar per-request costs aren't rounded to zero
+    # (default "f" formatting keeps only 6 and would silently drop tiny usage).
     stripe.billing.MeterEvent.create(
         event_name=EVENT_NAME,
         identifier=request_id,  # Stripe de-dupes on this
-        payload={"stripe_customer_id": customer_id, "value": format(value_usd, "f")},
+        payload={"stripe_customer_id": customer_id, "value": f"{value_usd:.12f}"},
     )
 
 
