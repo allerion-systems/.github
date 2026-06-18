@@ -103,38 +103,105 @@ def pipeline_counts() -> dict:
 
 # ------------------------------------------------------------------------- views
 CSS = """
-:root{--bg:#0b0d10;--panel:#14181d;--line:#232a31;--ink:#e9edf1;--mut:#8b97a3;--acc:#e07a3f}
-*{box-sizing:border-box}body{margin:0;background:var(--bg);color:var(--ink);
-font:16px/1.6 -apple-system,BlinkMacSystemFont,"Segoe UI",Roboto,Helvetica,Arial,sans-serif}
-a{color:var(--acc);text-decoration:none}.wrap{max-width:980px;margin:0 auto;padding:0 24px}
-header{border-bottom:1px solid var(--line)}header .wrap{display:flex;align-items:center;
-justify-content:space-between;height:64px}.brand{font-weight:700;letter-spacing:.02em}
-.brand b{color:var(--acc)}nav a{margin-left:20px;color:var(--mut)}nav a:hover{color:var(--ink)}
-.hero{padding:88px 0 64px;text-align:center}.hero h1{font-size:44px;line-height:1.1;margin:0 0 16px}
-.hero p{font-size:19px;color:var(--mut);max-width:640px;margin:0 auto 32px}
-.btn{display:inline-block;background:var(--acc);color:#fff;padding:12px 22px;border-radius:8px;font-weight:600}
-.btn.ghost{background:transparent;border:1px solid var(--line);color:var(--ink);margin-left:10px}
-.grid{display:grid;grid-template-columns:repeat(2,1fr);gap:16px;margin:48px 0}
-.card{background:var(--panel);border:1px solid var(--line);border-radius:12px;padding:22px}
-.card h3{margin:0 0 6px;font-size:17px}.card p{margin:0;color:var(--mut);font-size:14px}
-.price{display:grid;grid-template-columns:repeat(3,1fr);gap:16px;margin:24px 0 56px}
-.price .card{text-align:center}.price .amt{font-size:30px;font-weight:700;margin:8px 0}
-.price .amt small{font-size:14px;color:var(--mut);font-weight:400}
-section h2{font-size:13px;text-transform:uppercase;letter-spacing:.14em;color:var(--mut);margin:48px 0 0}
-form{background:var(--panel);border:1px solid var(--line);border-radius:12px;padding:24px;margin:20px 0 72px}
-label{display:block;font-size:13px;color:var(--mut);margin:12px 0 4px}
-input,select,textarea{width:100%;background:#0e1216;border:1px solid var(--line);color:var(--ink);
-border-radius:8px;padding:10px 12px;font:inherit}textarea{min-height:84px;resize:vertical}
-table{width:100%;border-collapse:collapse;margin:16px 0}th,td{text-align:left;padding:10px 8px;
-border-bottom:1px solid var(--line);font-size:14px}th{color:var(--mut);font-weight:600}
-.pill{display:inline-block;padding:2px 10px;border-radius:999px;font-size:12px;border:1px solid var(--line)}
-.s-new{color:#7aa2ff}.s-contacted{color:#e0c23f}.s-qualified{color:var(--acc)}
-.s-won{color:#4fbf72}.s-lost{color:#8b97a3}
-.kpis{display:grid;grid-template-columns:repeat(5,1fr);gap:12px;margin:20px 0}
-.kpi{background:var(--panel);border:1px solid var(--line);border-radius:10px;padding:14px;text-align:center}
-.kpi b{display:block;font-size:26px}.kpi span{color:var(--mut);font-size:12px;text-transform:uppercase}
-footer{border-top:1px solid var(--line);color:var(--mut);font-size:13px;padding:28px 0;text-align:center}
-.note{color:var(--mut);font-size:13px}
+:root{
+  --bg:#07090a;--bg2:#0b0f0c;--panel:#0f1411;--line:#1f2a22;--line2:#2b3a2e;
+  --ink:#e9f1ea;--mut:#7e8d82;--nv:#76b900;--nv2:#b6ff3a;--glow:rgba(118,185,0,.30);
+  --mono:ui-monospace,"SFMono-Regular","JetBrains Mono",Menlo,Consolas,monospace
+}
+*{box-sizing:border-box}html{scroll-behavior:smooth}
+body{margin:0;background:var(--bg);color:var(--ink);
+  font:16px/1.65 -apple-system,BlinkMacSystemFont,"Segoe UI",Roboto,Helvetica,Arial,sans-serif;
+  -webkit-font-smoothing:antialiased}
+body::before{content:"";position:fixed;inset:0;z-index:-2;
+  background:radial-gradient(900px 520px at 50% -12%,rgba(118,185,0,.12),transparent 70%),
+             linear-gradient(var(--bg2),var(--bg))}
+body::after{content:"";position:fixed;inset:0;z-index:-1;opacity:.55;
+  background-image:linear-gradient(rgba(118,185,0,.05) 1px,transparent 1px),
+                   linear-gradient(90deg,rgba(118,185,0,.05) 1px,transparent 1px);
+  background-size:46px 46px;-webkit-mask-image:radial-gradient(ellipse at 50% 0,#000,transparent 82%);
+  mask-image:radial-gradient(ellipse at 50% 0,#000,transparent 82%)}
+a{color:var(--nv);text-decoration:none}
+.wrap{max-width:1040px;margin:0 auto;padding:0 24px}
+.mono{font-family:var(--mono);text-transform:uppercase;letter-spacing:.18em;font-size:12px;color:var(--mut)}
+.nv{color:var(--nv)}
+header{position:sticky;top:0;z-index:10;backdrop-filter:blur(10px);
+  background:rgba(7,9,10,.72);border-bottom:1px solid var(--line)}
+header .wrap{display:flex;align-items:center;justify-content:space-between;height:62px}
+.brand{font-family:var(--mono);font-weight:700;letter-spacing:.22em;font-size:14px}
+.brand .mk{color:var(--nv)}
+nav a{margin-left:22px;font-family:var(--mono);font-size:12px;letter-spacing:.14em;
+  text-transform:uppercase;color:var(--mut)}
+nav a:hover{color:var(--ink)}
+.dot{display:inline-block;width:8px;height:8px;border-radius:50%;background:var(--nv);
+  box-shadow:0 0 0 0 var(--glow);animation:pulse 2s infinite}
+@keyframes pulse{0%{box-shadow:0 0 0 0 var(--glow)}70%{box-shadow:0 0 0 10px transparent}100%{box-shadow:0 0 0 0 transparent}}
+.hero{position:relative;padding:98px 0 56px;text-align:center}
+.hero .ey{display:inline-flex;align-items:center;gap:10px;margin-bottom:22px;
+  padding:6px 14px;border:1px solid var(--line2);border-radius:999px;background:var(--panel)}
+.hero h1{font-size:56px;line-height:1.03;margin:0 0 18px;letter-spacing:-.025em;font-weight:800}
+.hero h1 .g{background:linear-gradient(90deg,var(--nv),var(--nv2));-webkit-background-clip:text;
+  background-clip:text;color:transparent}
+.hero p{font-size:19px;color:var(--mut);max-width:660px;margin:0 auto 30px}
+.cta{display:inline-flex;gap:12px;flex-wrap:wrap;justify-content:center}
+.btn{display:inline-block;font-family:var(--mono);font-size:13px;letter-spacing:.1em;text-transform:uppercase;
+  background:var(--nv);color:#06140a;padding:13px 24px;border-radius:8px;font-weight:700;border:1px solid var(--nv);
+  transition:transform .15s,box-shadow .15s,background .15s;box-shadow:0 0 24px var(--glow);cursor:pointer}
+.btn:hover{transform:translateY(-2px);box-shadow:0 0 38px var(--glow);background:var(--nv2);border-color:var(--nv2)}
+.btn.ghost{background:transparent;color:var(--ink);border-color:var(--line2);box-shadow:none}
+.btn.ghost:hover{border-color:var(--nv);color:var(--nv)}
+section .lbl{display:flex;align-items:center;gap:14px;margin:62px 0 22px;
+  font-family:var(--mono);text-transform:uppercase;letter-spacing:.18em;font-size:12px;color:var(--mut)}
+section .lbl::after{content:"";flex:1;height:1px;background:linear-gradient(90deg,var(--line2),transparent)}
+.grid{display:grid;grid-template-columns:repeat(2,1fr);gap:14px}
+.card{position:relative;background:var(--panel);border:1px solid var(--line);border-radius:12px;padding:24px;
+  transition:border-color .2s,transform .2s,box-shadow .2s;overflow:hidden}
+.card::before{content:"";position:absolute;left:0;top:0;width:32px;height:32px;
+  border-top:2px solid var(--nv);border-left:2px solid var(--nv);opacity:.45;transition:opacity .2s}
+.card::after{content:"";position:absolute;right:0;bottom:0;width:32px;height:32px;
+  border-bottom:2px solid var(--nv);border-right:2px solid var(--nv);opacity:.45;transition:opacity .2s}
+.card:hover{border-color:var(--line2);transform:translateY(-3px);box-shadow:0 14px 44px rgba(0,0,0,.55)}
+.card:hover::before,.card:hover::after{opacity:1}
+.card .ix{font-family:var(--mono);font-size:12px;color:var(--nv);letter-spacing:.16em}
+.card h3{margin:8px 0 6px;font-size:18px}
+.card p{margin:0;color:var(--mut);font-size:14px}
+.telem{display:grid;grid-template-columns:repeat(4,1fr);gap:14px;margin:22px 0}
+.telem .t{position:relative;background:var(--panel);border:1px solid var(--line);border-radius:10px;padding:16px}
+.telem .k{font-family:var(--mono);font-size:11px;color:var(--mut);letter-spacing:.14em;text-transform:uppercase}
+.telem .v{font-size:26px;font-weight:800;margin-top:4px}
+.telem .v small{color:var(--nv);font-size:13px;font-weight:600}
+.bars{display:flex;gap:3px;align-items:flex-end;height:24px;margin-top:12px}
+.bars i{flex:1;background:var(--nv);opacity:.7;border-radius:1px;height:30%;animation:eq 1.2s ease-in-out infinite}
+.bars i:nth-child(2){animation-delay:.12s}.bars i:nth-child(3){animation-delay:.24s}
+.bars i:nth-child(4){animation-delay:.36s}.bars i:nth-child(5){animation-delay:.48s}
+.bars i:nth-child(6){animation-delay:.6s}.bars i:nth-child(7){animation-delay:.72s}
+@keyframes eq{0%,100%{height:25%}50%{height:100%}}
+.price{display:grid;grid-template-columns:repeat(3,1fr);gap:14px}
+.price .card{text-align:center}
+.price .card.feat{border-color:var(--nv);box-shadow:0 0 30px var(--glow)}
+.price .amt{font-size:32px;font-weight:800;margin:10px 0}
+.price .amt small{font-size:13px;color:var(--mut);font-weight:500;font-family:var(--mono)}
+form{background:var(--panel);border:1px solid var(--line);border-radius:14px;padding:26px;margin:18px 0 80px}
+label{display:block;font-family:var(--mono);font-size:11px;letter-spacing:.12em;text-transform:uppercase;
+  color:var(--mut);margin:14px 0 6px}
+input,select,textarea{width:100%;background:#070a08;border:1px solid var(--line2);color:var(--ink);
+  border-radius:8px;padding:11px 13px;font:inherit;transition:border-color .15s,box-shadow .15s}
+input:focus,select:focus,textarea:focus{outline:none;border-color:var(--nv);box-shadow:0 0 0 3px var(--glow)}
+textarea{min-height:88px;resize:vertical}
+table{width:100%;border-collapse:collapse;margin:16px 0}
+th,td{text-align:left;padding:12px 10px;border-bottom:1px solid var(--line);font-size:14px}
+th{font-family:var(--mono);font-size:11px;letter-spacing:.1em;text-transform:uppercase;color:var(--mut)}
+td .em{color:var(--mut);font-size:12px;font-family:var(--mono)}
+.pill{display:inline-block;padding:3px 11px;border-radius:999px;font-size:11px;font-family:var(--mono);
+  text-transform:uppercase;letter-spacing:.08em;border:1px solid var(--line2)}
+.s-new{color:#7ab8ff;border-color:#274a6b}.s-contacted{color:var(--nv2);border-color:#3a4a16}
+.s-qualified{color:var(--nv);border-color:#2d4a12}.s-won{color:#39e07d;border-color:#1d5a35}.s-lost{color:#8b97a3}
+.kpis{display:grid;grid-template-columns:repeat(5,1fr);gap:12px;margin:18px 0}
+.kpi{background:var(--panel);border:1px solid var(--line);border-radius:10px;padding:16px;text-align:center}
+.kpi b{display:block;font-size:30px;font-weight:800;color:var(--nv)}
+.kpi span{font-family:var(--mono);font-size:10px;letter-spacing:.14em;text-transform:uppercase;color:var(--mut)}
+footer{border-top:1px solid var(--line);color:var(--mut);padding:30px 0;text-align:center}
+.note{color:var(--mut);font-size:12px;font-family:var(--mono);letter-spacing:.04em}
+code{font-family:var(--mono);color:var(--nv);font-size:13px}
 """
 
 CAPABILITIES = [
@@ -156,41 +223,53 @@ def page(title: str, body: str) -> bytes:
 <meta name="viewport" content="width=device-width,initial-scale=1">
 <title>{html.escape(title)}</title><style>{CSS}</style></head><body>
 <header><div class="wrap">
-  <div class="brand">▲ ALLERION<b>.io</b></div>
-  <nav><a href="/">Platform</a><a href="/#pricing">Pricing</a><a href="/crm">CRM</a></nav>
+  <div class="brand"><span class="mk">&#9650;</span> ALLERION<span class="nv">.IO</span></div>
+  <nav><a href="/">System</a><a href="/#pricing">Pricing</a><a href="/crm">Console</a></nav>
 </div></header>
 {body}
-<footer><div class="wrap">Allerion Systems — autonomous intelligence for the built world. We don't sell software. We deploy intelligence.</div></footer>
+<footer><div class="wrap"><div class="mono"><span class="nv">&#9650;</span> Allerion Systems — autonomous intelligence for the built world</div>
+<div class="note" style="margin-top:8px">We don't sell software. We deploy intelligence.</div></div></footer>
 </body></html>"""
     return doc.encode()
 
 
 def landing() -> bytes:
     caps = "".join(
-        f'<div class="card"><h3>{html.escape(t)}</h3><p>{html.escape(d)}</p></div>'
-        for t, d in CAPABILITIES
+        f'<div class="card"><div class="ix">{i:02d}</div>'
+        f'<h3>{html.escape(t)}</h3><p>{html.escape(d)}</p></div>'
+        for i, (t, d) in enumerate(CAPABILITIES, 1)
     )
     price = "".join(
-        f'<div class="card"><h3>{html.escape(n)}</h3>'
+        f'<div class="card{" feat" if i == 1 else ""}"><div class="ix mono">{html.escape(n)}</div>'
         f'<div class="amt">{html.escape(a)} <small>{html.escape(p)}</small></div>'
         f'<p>{html.escape(d)}</p></div>'
-        for n, a, p, d in PRICING
+        for i, (n, a, p, d) in enumerate(PRICING)
     )
+    bars = "".join("<i></i>" for _ in range(7))
     body = f"""
 <div class="hero"><div class="wrap">
-  <h1>Autonomous intelligence<br>for the built world.</h1>
+  <div class="ey"><span class="dot"></span><span class="mono">Autonomous systems &middot; online</span></div>
+  <h1>Autonomous intelligence<br>for the <span class="g">built world</span>.</h1>
   <p>We design, deploy, and operate multi-agent AI systems for infrastructure,
      construction, and industrial operations. Our agents estimate. Our agents build.
      Our agents never sleep.</p>
-  <a class="btn" href="#access">Request access</a>
-  <a class="btn ghost" href="/crm">Open CRM</a>
+  <div class="cta">
+    <a class="btn" href="#access">Request access</a>
+    <a class="btn ghost" href="/crm">Open console</a>
+  </div>
 </div></div>
 <div class="wrap">
-  <section><h2>Capabilities</h2></section>
+  <div class="telem">
+    <div class="t"><div class="k">Agents online</div><div class="v">80 <small>&#9650;</small></div></div>
+    <div class="t"><div class="k">Models routed</div><div class="v">80+ <small>NIM</small></div></div>
+    <div class="t"><div class="k">Fleet uptime</div><div class="v">99.9<small>%</small></div></div>
+    <div class="t"><div class="k">Throughput</div><div class="bars">{bars}</div></div>
+  </div>
+  <section><div class="lbl">// Capabilities</div></section>
   <div class="grid">{caps}</div>
-  <section id="pricing"><h2>Pricing</h2></section>
+  <section id="pricing"><div class="lbl">// Pricing</div></section>
   <div class="price">{price}</div>
-  <section id="access"><h2>Request access</h2></section>
+  <section id="access"><div class="lbl">// Request access</div></section>
   <form method="post" action="/api/leads">
     <label>Name</label><input name="name" required>
     <label>Work email</label><input name="email" type="email" required>
@@ -201,8 +280,8 @@ def landing() -> bytes:
       <option>Sovereign AI</option><option>Construction ERP</option><option>Digital Twin</option>
     </select>
     <label>Message</label><textarea name="message" placeholder="What are you building?"></textarea>
-    <p style="margin-top:18px"><button class="btn" type="submit">Request access</button></p>
-    <p class="note">Submitting creates a lead in the embedded CRM.</p>
+    <p style="margin-top:18px"><button class="btn" type="submit">Request access &rarr;</button></p>
+    <p class="note">// submitting creates a lead in the embedded CRM</p>
   </form>
 </div>"""
     return page("Allerion — Autonomous AI for the built world", body)
@@ -236,13 +315,16 @@ def crm_page() -> bytes:
         "<tr><td colspan='6' class='note'>No leads yet — submit the form on the landing page.</td></tr>")
         + "</table>"
     )
-    body = f"""<div class="wrap">
-  <section><h2>CRM — pipeline</h2></section>
+    body = f"""<div class="wrap" style="padding-top:40px">
+  <div class="ey" style="display:inline-flex;align-items:center;gap:10px;padding:6px 14px;
+       border:1px solid var(--line2);border-radius:999px;background:var(--panel)">
+    <span class="dot"></span><span class="mono">CRM console &middot; live</span></div>
+  <section><div class="lbl">// Pipeline telemetry</div></section>
   <div class="kpis">{kpis}</div>
   {table}
-  <p class="note">Embedded CRM over the same SQLite store. JSON API at <code>/api/leads</code>.</p>
+  <p class="note">// embedded CRM over the same SQLite store &middot; JSON API at <code>/api/leads</code></p>
 </div>"""
-    return page("Allerion CRM", body)
+    return page("Allerion Console — CRM", body)
 
 
 # ----------------------------------------------------------------------- handler
