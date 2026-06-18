@@ -31,6 +31,8 @@ import billing
 
 DB_PATH = os.environ.get("ALLERION_CRM_DB", os.path.join(os.path.dirname(__file__), "crm.db"))
 PIPELINE = ["new", "contacted", "qualified", "won", "lost"]
+# Self-serve skills store (apps/store) — buy Claude Skills + the Codex plugin.
+STORE_URL = os.environ.get("STORE_URL", "http://127.0.0.1:8088")
 
 
 # --------------------------------------------------------------------------- db
@@ -227,7 +229,7 @@ def page(title: str, body: str) -> bytes:
 <title>{html.escape(title)}</title><style>{CSS}</style></head><body>
 <header><div class="wrap">
   <div class="brand"><span class="mk">&#9650;</span> ALLERION<span class="nv">.IO</span></div>
-  <nav><a href="/">System</a><a href="/#pricing">Pricing</a><a href="/crm">Console</a></nav>
+  <nav><a href="/">System</a><a href="/#pricing">Pricing</a><a href="{STORE_URL}">Skills</a><a href="/crm">Console</a></nav>
 </div></header>
 {body}
 <footer><div class="wrap"><div class="mono"><span class="nv">&#9650;</span> Allerion Systems — autonomous intelligence for the built world</div>
@@ -263,6 +265,7 @@ def landing() -> bytes:
      Our agents never sleep.</p>
   <div class="cta">
     <a class="btn" href="#access">Request access</a>
+    <a class="btn ghost" href="{STORE_URL}">Buy skills &rarr;</a>
     <a class="btn ghost" href="/crm">Open console</a>
   </div>
 </div></div>

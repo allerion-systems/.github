@@ -1,0 +1,6 @@
+# Add this block to ~/.codex/config.toml to register Allerion DevKit with Codex.
+# Replace the path with the absolute path to server.py on your machine.
+
+[mcp_servers.allerion_devkit]
+command = "python3"
+args = ["/absolute/path/to/codex-devkit/server.py"]
