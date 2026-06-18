@@ -1,0 +1,34 @@
+# Caddy auto-provisions a Let's Encrypt TLS cert for api.allerion.io as soon
+# as the A/AAAA record points here and ports 80/443 are reachable.
+#
+# Set an ACME contact email (optional but recommended) by replacing the
+# global block email below, or via the CADDY_ACME_EMAIL build arg / env.
+
+{
+	# email you@allerion.io
+}
+
+api.allerion.io {
+	encode zstd gzip
+
+	# LiteLLM streams SSE for chat completions; Caddy handles this natively.
+	reverse_proxy litellm:4000 {
+		# Give long-running / streaming completions room to finish.
+		transport http {
+			read_timeout 600s
+			write_timeout 600s
+		}
+	}
+
+	# Basic hardening headers.
+	header {
+		Strict-Transport-Security "max-age=31536000; includeSubDomains"
+		X-Content-Type-Options "nosniff"
+		-Server
+	}
+
+	log {
+		output stdout
+		format console
+	}
+}

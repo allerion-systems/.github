@@ -1,0 +1,68 @@
+# LiteLLM proxy config — Allerion AI Gateway
+#
+# Every model below routes to NVIDIA's hosted, OpenAI-compatible endpoint
+# (https://integrate.api.nvidia.com/v1) using your server-side NVIDIA_API_KEY.
+# Clients NEVER see that key — they authenticate to this proxy with virtual
+# keys you mint (see README).
+#
+# IMPORTANT: model strings after `nvidia_nim/` MUST match the exact model IDs
+# in the NVIDIA catalog at https://build.nvidia.com/models. The list below is
+# a representative starting set — verify/trim it against the catalog and your
+# entitlement. `model_name` is the alias your clients call; the right-hand
+# `model:` is what LiteLLM sends upstream.
+
+model_list:
+  - model_name: deepseek-r1
+    litellm_params:
+      model: nvidia_nim/deepseek-ai/deepseek-r1
+      api_key: os.environ/NVIDIA_API_KEY
+
+  - model_name: llama-3.3-70b
+    litellm_params:
+      model: nvidia_nim/meta/llama-3.3-70b-instruct
+      api_key: os.environ/NVIDIA_API_KEY
+
+  - model_name: nemotron-70b
+    litellm_params:
+      model: nvidia_nim/nvidia/llama-3.1-nemotron-70b-instruct
+      api_key: os.environ/NVIDIA_API_KEY
+
+  - model_name: qwen-coder-32b
+    litellm_params:
+      model: nvidia_nim/qwen/qwen2.5-coder-32b-instruct
+      api_key: os.environ/NVIDIA_API_KEY
+
+  - model_name: mistral-large
+    litellm_params:
+      model: nvidia_nim/mistralai/mistral-large-2-instruct
+      api_key: os.environ/NVIDIA_API_KEY
+
+  # --- Verify the exact catalog IDs before enabling these ---
+  # - model_name: glm-4
+  #   litellm_params:
+  #     model: nvidia_nim/zai/<glm-model-id>
+  #     api_key: os.environ/NVIDIA_API_KEY
+  # - model_name: kimi-k2
+  #   litellm_params:
+  #     model: nvidia_nim/moonshotai/<kimi-model-id>
+  #     api_key: os.environ/NVIDIA_API_KEY
+
+  # --- Upgrade path: when you self-host on your own GPUs, add them here ---
+  # and clients/keys never change, just point at your NIM/vLLM box:
+  # - model_name: deepseek-r1-sovereign
+  #   litellm_params:
+  #     model: openai/deepseek-ai/deepseek-r1
+  #     api_base: http://gpu-node-1.internal:8000/v1
+  #     api_key: os.environ/SOVEREIGN_NODE_KEY
+
+general_settings:
+  master_key: os.environ/LITELLM_MASTER_KEY
+  database_url: os.environ/DATABASE_URL
+
+litellm_settings:
+  # Don't leak upstream provider errors verbatim to clients.
+  set_verbose: false
+  drop_params: true
+  # Sane default cap; override per virtual key.
+  max_budget: 100
+  budget_duration: 30d
