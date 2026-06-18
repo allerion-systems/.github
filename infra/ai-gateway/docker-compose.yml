@@ -59,6 +59,21 @@ services:
       timeout: 5s
       retries: 5
 
+  # Metered billing: streams LiteLLM usage into Stripe. Opt-in — only starts
+  # with:  docker compose --profile billing up -d
+  billing:
+    build: ./billing
+    restart: unless-stopped
+    profiles: ["billing"]
+    environment:
+      DATABASE_URL: postgresql://litellm:${POSTGRES_PASSWORD:?set POSTGRES_PASSWORD in .env}@postgres:5432/litellm
+      STRIPE_API_KEY: ${STRIPE_API_KEY:-}
+      STRIPE_METER_EVENT_NAME: ${STRIPE_METER_EVENT_NAME:-allerion_api_usage}
+      BILLING_SYNC_INTERVAL: ${BILLING_SYNC_INTERVAL:-60}
+    depends_on:
+      postgres:
+        condition: service_healthy
+
 volumes:
   caddy_data:
   caddy_config:

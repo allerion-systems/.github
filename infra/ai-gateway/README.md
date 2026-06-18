@@ -93,6 +93,13 @@ Edit `litellm/config.yaml`. The `model_name` is the alias clients call; the
 `model:` value must match an exact ID from <https://build.nvidia.com/models>.
 Verify IDs against the catalog and your entitlement before enabling them.
 
+## Billing (charge customers)
+
+Optional metered billing via Stripe lives in [`billing/`](billing/). It maps each
+virtual key to a Stripe customer and invoices `underlying_cost x markup`
+automatically. Enable with `docker compose --profile billing up -d` — see
+[`billing/README.md`](billing/README.md).
+
 ## Hardening checklist
 
 - [ ] `.env` is git-ignored (it is) and never committed.
