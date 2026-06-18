@@ -2,7 +2,7 @@
 from __future__ import annotations
 
 from dataclasses import dataclass, field
-from typing import List, Optional
+from typing import Any, List, Optional
 
 from .protocol import Need, Service
 
@@ -14,6 +14,7 @@ class MerchantAgent:
     services: List[Service] = field(default_factory=list)
     concession: float = 0.4   # how fast it moves from ask toward floor (0..1)
     sales: int = 0
+    connector: Optional[Any] = None  # gateway connector (see connector.Connector)
 
     def offer(self, service: Service) -> "MerchantAgent":
         self.services.append(service)
@@ -39,6 +40,7 @@ class BuyerAgent:
     quality_weight: float = 0.5   # how much it trades price for quality
     concession: float = 0.4
     purchases: int = 0
+    connector: Optional[Any] = None  # gateway connector (see connector.Connector)
 
     def score(self, need: Need, service: Service) -> float:
         """Expected utility of a supplier before negotiating: value adjusted
