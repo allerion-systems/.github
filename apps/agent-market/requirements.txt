@@ -1,0 +1,5 @@
+# The app — offline AND live fulfilment — runs on the Python standard library
+# alone. No runtime dependencies.
+#
+# Dev only:
+pytest>=8.0
