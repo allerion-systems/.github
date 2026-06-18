@@ -27,6 +27,8 @@ import urllib.parse
 from datetime import datetime, timezone
 from http.server import BaseHTTPRequestHandler, ThreadingHTTPServer
 
+import billing
+
 DB_PATH = os.environ.get("ALLERION_CRM_DB", os.path.join(os.path.dirname(__file__), "crm.db"))
 PIPELINE = ["new", "contacted", "qualified", "won", "lost"]
 
@@ -211,10 +213,11 @@ CAPABILITIES = [
     ("Sovereign AI", "Self-hosted LLM deployment on private infrastructure — your models, your silicon."),
 ]
 
+#   name, amount, period, description, cta-tier (None → request-access anchor)
 PRICING = [
-    ("Gateway", "$0", "/mo to start", "Branded OpenAI-compatible API at api.allerion.io. Pay only for usage."),
-    ("Team", "$2k", "/mo", "Virtual keys, budgets, metered Stripe billing, priority routing."),
-    ("Sovereign", "Custom", "", "Self-hosted GPU deployment + on-prem agent orchestration."),
+    ("Gateway", "$0", "/mo to start", "Branded OpenAI-compatible API at api.allerion.io. Pay only for usage.", None),
+    ("Team", "$2k", "/mo", "Virtual keys, budgets, metered Stripe billing, priority routing.", "team"),
+    ("Sovereign", "Custom", "", "Self-hosted GPU deployment + on-prem agent orchestration.", None),
 ]
 
 
@@ -239,11 +242,16 @@ def landing() -> bytes:
         f'<h3>{html.escape(t)}</h3><p>{html.escape(d)}</p></div>'
         for i, (t, d) in enumerate(CAPABILITIES, 1)
     )
+    def price_cta(tier):
+        if tier:
+            return f'<p style="margin:16px 0 0"><a class="btn" href="/buy/{tier}">Subscribe &rarr;</a></p>'
+        return '<p style="margin:16px 0 0"><a class="btn ghost" href="#access">Request access</a></p>'
+
     price = "".join(
         f'<div class="card{" feat" if i == 1 else ""}"><div class="ix mono">{html.escape(n)}</div>'
         f'<div class="amt">{html.escape(a)} <small>{html.escape(p)}</small></div>'
-        f'<p>{html.escape(d)}</p></div>'
-        for i, (n, a, p, d) in enumerate(PRICING)
+        f'<p>{html.escape(d)}</p>{price_cta(tier)}</div>'
+        for i, (n, a, p, d, tier) in enumerate(PRICING)
     )
     bars = "".join("<i></i>" for _ in range(7))
     body = f"""
@@ -363,10 +371,40 @@ class Handler(BaseHTTPRequestHandler):
             self._send(200, crm_page())
         elif path == "/api/leads":
             self._json(200, {"leads": list_leads()})
+        elif path.startswith("/buy/"):
+            self._checkout(path.split("/")[2])
         elif path == "/healthz":
-            self._json(200, {"ok": True})
+            self._json(200, {"ok": True, "billing": billing.live()})
         else:
             self._send(404, page("Not found", '<div class="wrap"><div class="hero"><h1>404</h1></div></div>'))
+
+    def _checkout(self, tier: str):
+        """Create a Stripe Checkout Session and redirect the buyer to it."""
+        if tier not in billing.TIERS:
+            return self._send(404, page("Unknown plan",
+                '<div class="wrap"><div class="hero"><h1>Unknown plan</h1>'
+                '<p>No such tier.</p><a class="btn" href="/#pricing">Back to pricing</a></div></div>'))
+        if not billing.live():
+            return self._send(200, page("Checkout — configuring", f"""
+<div class="wrap"><div class="hero">
+  <div class="ey"><span class="dot"></span><span class="mono">Billing &middot; pending key</span></div>
+  <h1>Almost <span class="g">live</span>.</h1>
+  <p>Stripe Checkout for the <b>{html.escape(tier.title())}</b> plan is wired and ready —
+     it just needs the Stripe secret key set as <code>STRIPE_API_KEY</code>.
+     Once that's in the environment, this button opens Stripe Checkout directly.</p>
+  <a class="btn" href="/#access">Request access</a>
+  <a class="btn ghost" href="/crm">Open console</a>
+</div></div>"""))
+        try:
+            session = billing.create_checkout(tier)
+        except Exception as e:  # noqa: BLE001 — surface a friendly page
+            return self._send(502, page("Checkout error", f"""
+<div class="wrap"><div class="hero"><h1>Checkout unavailable</h1>
+  <p class="note">{html.escape(str(e))[:300]}</p>
+  <a class="btn" href="/#pricing">Back to pricing</a></div></div>"""))
+        self.send_response(303)
+        self.send_header("Location", session["url"])
+        self.end_headers()
 
     def do_POST(self):
         path = urllib.parse.urlparse(self.path).path
