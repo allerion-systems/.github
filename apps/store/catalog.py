@@ -47,6 +47,19 @@ PRODUCTS: dict[str, dict] = {
         "sources": ["products/claude-skills/test-forge"],
         "price_env": "STRIPE_PRICE_TEST_FORGE",
     },
+    "allerion-assistant": {
+        "name": "Allerion Assistant",
+        "kind": "Self-hosted AI App",
+        "price": 12900,  # $129.00
+        "tagline": "Your own AI chat — self-hosted, powered by Claude.",
+        "blurb": "A complete, brandable AI assistant you run yourself: a streaming "
+                 "chat web UI plus a backend on the official Anthropic SDK "
+                 "(Claude Opus 4.8, adaptive thinking, effort control). Point it at "
+                 "the Anthropic API or your own gateway. One file to run, yours to "
+                 "rebrand, persist, and extend with tools.",
+        "sources": ["products/allerion-assistant"],
+        "price_env": "STRIPE_PRICE_ALLERION_ASSISTANT",
+    },
     "codex-devkit": {
         "name": "Allerion DevKit for Codex",
         "kind": "Codex Plugin (MCP)",

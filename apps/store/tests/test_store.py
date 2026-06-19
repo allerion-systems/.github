@@ -74,6 +74,24 @@ def test_bundle_zip_contains_all_products():
     assert "codex-devkit/server.py" in names
 
 
+def test_assistant_zip_contains_app_and_requirements():
+    token = fulfillment.mint_license("allerion-assistant", "buyer@acme.co")
+    blob = fulfillment.build_zip("allerion-assistant", "buyer@acme.co", token)
+    names = zipfile.ZipFile(io.BytesIO(blob)).namelist()
+    assert "allerion-assistant/assistant.py" in names
+    assert "allerion-assistant/requirements.txt" in names
+    assert "allerion-assistant/LICENSE.txt" in names
+
+
+def test_assistant_app_compiles():
+    import py_compile
+    here = os.path.dirname(os.path.dirname(os.path.abspath(__file__)))
+    py_compile.compile(
+        os.path.join(here, "products", "allerion-assistant", "assistant.py"),
+        doraise=True,
+    )
+
+
 def test_every_claude_skill_has_valid_frontmatter():
     here = os.path.dirname(os.path.dirname(os.path.abspath(__file__)))
     skills_dir = os.path.join(here, "products", "claude-skills")
