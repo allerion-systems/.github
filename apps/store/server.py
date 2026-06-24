@@ -15,14 +15,18 @@ Routes
     GET /success              verify the paid session, mint license, show download
     GET /download?token=...    verify license, stream the product zip
     GET /healthz               health check
+    POST /webhook              Stripe webhook (signed) — records sales durably
 """
 from __future__ import annotations
 
 import argparse
+import hashlib
+import hmac
 import html
 import json
 import os
 import sqlite3
+import time
 import urllib.parse
 from datetime import datetime, timezone
 from http.server import BaseHTTPRequestHandler, ThreadingHTTPServer
@@ -34,6 +38,8 @@ import payments
 DB_PATH = os.environ.get("STORE_DB", os.path.join(os.path.dirname(__file__), "store.db"))
 # Allow handing over a product without Stripe ONLY when explicitly enabled (local testing).
 DEV_FULFILLMENT = os.environ.get("STORE_DEV_FULFILLMENT", "") == "1"
+STRIPE_WEBHOOK_SECRET = os.environ.get("STRIPE_WEBHOOK_SECRET", "").strip()
+WEBHOOK_TOLERANCE = 300  # reject events whose timestamp is older than 5 minutes
 
 
 # --------------------------------------------------------------------------- db
@@ -47,25 +53,41 @@ def init_db() -> None:
     with db() as conn:
         conn.execute(
             """CREATE TABLE IF NOT EXISTS orders (
-                id          INTEGER PRIMARY KEY AUTOINCREMENT,
-                slug        TEXT NOT NULL,
-                email       TEXT,
-                amount      INTEGER,
-                currency    TEXT,
-                session_id  TEXT UNIQUE,
-                source      TEXT NOT NULL,          -- 'stripe' | 'dev'
-                created_at  TEXT NOT NULL
+                id            INTEGER PRIMARY KEY AUTOINCREMENT,
+                slug          TEXT NOT NULL,
+                email         TEXT,
+                amount        INTEGER,
+                currency      TEXT,
+                session_id    TEXT UNIQUE,
+                source        TEXT NOT NULL,        -- 'stripe' | 'dev'
+                created_at    TEXT NOT NULL,
+                license_token TEXT
             )"""
+        )
+        # Migration for existing DBs created before license_token existed.
+        try:
+            conn.execute("ALTER TABLE orders ADD COLUMN license_token TEXT")
+        except sqlite3.OperationalError:
+            pass  # duplicate column — already migrated
+
+
+def record_order(slug, email, amount, currency, session_id, source, license_token=None) -> None:
+    with db() as conn:
+        conn.execute(
+            "INSERT OR IGNORE INTO orders"
+            " (slug,email,amount,currency,session_id,source,created_at,license_token)"
+            " VALUES (?,?,?,?,?,?,?,?)",
+            (slug, email, amount, currency, session_id, source,
+             datetime.now(timezone.utc).isoformat(timespec="seconds"), license_token),
         )
 
 
-def record_order(slug, email, amount, currency, session_id, source) -> None:
+def set_license_token(session_id, license_token) -> None:
+    """Persist the minted license token on an existing order row (idempotent)."""
     with db() as conn:
         conn.execute(
-            "INSERT OR IGNORE INTO orders (slug,email,amount,currency,session_id,source,created_at)"
-            " VALUES (?,?,?,?,?,?,?)",
-            (slug, email, amount, currency, session_id, source,
-             datetime.now(timezone.utc).isoformat(timespec="seconds")),
+            "UPDATE orders SET license_token=? WHERE session_id=? AND license_token IS NULL",
+            (license_token, session_id),
         )
 
 
@@ -75,6 +97,42 @@ def revenue() -> tuple[int, int]:
             "SELECT COUNT(*) n, COALESCE(SUM(amount),0) gross FROM orders WHERE source='stripe'"
         ).fetchone()
         return r["n"], r["gross"]
+
+
+# ------------------------------------------------------------------- webhook auth
+def verify_stripe_signature(payload: bytes, sig_header: str, secret: str,
+                            tolerance: int = WEBHOOK_TOLERANCE, now: float | None = None) -> bool:
+    """Verify a Stripe webhook signature header (stdlib only).
+
+    Header form: ``t=<ts>,v1=<hexdigest>[,v1=<hexdigest>...]``. We rebuild
+    ``<t>.<raw_body>``, HMAC-SHA256 it with the endpoint secret, and accept if any
+    advertised v1 digest matches. Reject if the timestamp is outside `tolerance`.
+    """
+    if not secret or not sig_header:
+        return False
+    parts = {}
+    v1 = []
+    for item in sig_header.split(","):
+        k, _, v = item.partition("=")
+        k, v = k.strip(), v.strip()
+        if k == "v1":
+            v1.append(v)
+        elif k:
+            parts[k] = v
+    ts = parts.get("t")
+    if not ts or not v1:
+        return False
+    try:
+        ts_int = int(ts)
+    except ValueError:
+        return False
+    if tolerance:
+        current = time.time() if now is None else now
+        if abs(current - ts_int) > tolerance:
+            return False
+    signed_payload = f"{ts}.{payload.decode('utf-8', 'replace')}"
+    expected = hmac.new(secret.encode(), signed_payload.encode(), hashlib.sha256).hexdigest()
+    return any(hmac.compare_digest(expected, candidate) for candidate in v1)
 
 
 # ------------------------------------------------------------------------- views
@@ -305,6 +363,48 @@ class Handler(BaseHTTPRequestHandler):
         else:
             self._send(404, error_page("404", "No such page.", 404))
 
+    def do_POST(self):
+        path = urllib.parse.urlparse(self.path).path
+        if path == "/webhook":
+            self._webhook()
+        else:
+            self._json(404, {"error": "not found"})
+
+    def _webhook(self):
+        if not STRIPE_WEBHOOK_SECRET:
+            return self._json(503, {"error": "webhook not configured",
+                                    "detail": "STRIPE_WEBHOOK_SECRET is not set."})
+        length = int(self.headers.get("Content-Length") or 0)
+        raw = self.rfile.read(length) if length else b""
+        sig = self.headers.get("Stripe-Signature", "")
+        if not verify_stripe_signature(raw, sig, STRIPE_WEBHOOK_SECRET):
+            return self._json(400, {"error": "invalid signature"})
+        try:
+            event = json.loads(raw)
+        except (ValueError, json.JSONDecodeError):
+            return self._json(400, {"error": "invalid payload"})
+
+        if event.get("type") != "checkout.session.completed":
+            return self._json(200, {"ignored": event.get("type")})
+
+        session = (event.get("data") or {}).get("object") or {}
+        if session.get("payment_status") != "paid":
+            return self._json(200, {"ignored": "unpaid"})
+
+        slug = (session.get("metadata") or {}).get("slug", "")
+        if slug not in catalog.PRODUCTS:
+            return self._json(200, {"ignored": "unknown product"})
+        email = (session.get("customer_details") or {}).get("email") \
+            or session.get("customer_email") or ""
+        session_id = session.get("id") or ""
+        token = fulfillment.mint_license(slug, email)
+        # Idempotent: INSERT OR IGNORE on the UNIQUE session_id; the success page may
+        # have recorded the row already, in which case we just backfill the token.
+        record_order(slug, email, session.get("amount_total"),
+                     session.get("currency"), session_id, "stripe", license_token=token)
+        set_license_token(session_id, token)
+        return self._json(200, {"received": True, "slug": slug})
+
     def _buy(self, slug):
         if slug not in catalog.PRODUCTS:
             return self._send(404, error_page("Unknown product", "No such item.", 404))
@@ -342,9 +442,10 @@ class Handler(BaseHTTPRequestHandler):
             return self._send(400, error_page("Unknown product", "Session has no product.", 400))
         email = (session.get("customer_details") or {}).get("email") \
             or session.get("customer_email") or ""
-        record_order(slug, email, session.get("amount_total"),
-                     session.get("currency"), session_id, "stripe")
         token = fulfillment.mint_license(slug, email)
+        record_order(slug, email, session.get("amount_total"),
+                     session.get("currency"), session_id, "stripe", license_token=token)
+        set_license_token(session_id, token)
         self._send(200, download_page(slug, email, token))
 
     def _download(self, q):

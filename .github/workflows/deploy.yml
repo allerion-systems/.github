@@ -1,0 +1,66 @@
+# Deploy Allerion to the VPS over SSH.
+#
+# This workflow is INERT until you add the repo secrets below. With no secrets
+# set, the single job short-circuits on its first step and exits successfully
+# (it does NOT attempt to SSH anywhere).
+#
+# Add these in GitHub -> Settings -> Secrets and variables -> Actions -> New
+# repository secret:
+#
+#   VPS_HOST      (required)  the VPS hostname or public IP
+#   VPS_USER      (required)  the SSH login user on the VPS
+#   VPS_SSH_KEY   (required)  a private SSH key authorized on the VPS (PEM)
+#   VPS_PORT      (optional)  SSH port; defaults to 22 if unset
+#
+# CAVEAT: this assumes the repo is already checked out at ~/allerion on the VPS
+# (see deploy/DEPLOY.md step 2 — `git clone ... allerion`). The deploy step only
+# fetches/pulls and rebuilds; it does not bootstrap a fresh host.
+
+name: Deploy to VPS
+
+on:
+  workflow_dispatch:
+  push:
+    # NOTE: change this to `main` once the deploy branch is merged.
+    branches:
+      - claude/nvidia-ai-models-access-mmn5n5
+    paths:
+      - "apps/**"
+      - "deploy/**"
+
+jobs:
+  deploy:
+    runs-on: ubuntu-latest
+    steps:
+      # Secrets can't be referenced in a job-level `if:`, so we gate here:
+      # map the secret into an env var and skip the rest of the job when empty.
+      # This keeps the workflow inert (green, no-op) until secrets are added.
+      - name: Check that deploy secrets are configured
+        id: gate
+        env:
+          VPS_HOST: ${{ secrets.VPS_HOST }}
+        run: |
+          if [ -z "$VPS_HOST" ]; then
+            echo "VPS_HOST secret is not set — skipping deploy (this is expected until you add secrets)."
+            echo "configured=false" >> "$GITHUB_OUTPUT"
+          else
+            echo "configured=true" >> "$GITHUB_OUTPUT"
+          fi
+
+      - name: Deploy over SSH
+        if: steps.gate.outputs.configured == 'true'
+        uses: appleboy/ssh-action@v1.2.0
+        with:
+          host: ${{ secrets.VPS_HOST }}
+          username: ${{ secrets.VPS_USER }}
+          key: ${{ secrets.VPS_SSH_KEY }}
+          # appleboy/ssh-action defaults port to 22 when this is empty.
+          port: ${{ secrets.VPS_PORT }}
+          script: |
+            set -e
+            cd ~/allerion
+            git fetch
+            git checkout claude/nvidia-ai-models-access-mmn5n5
+            git pull --ff-only
+            cd deploy
+            docker compose up -d --build

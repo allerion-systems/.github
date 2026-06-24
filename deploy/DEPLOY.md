@@ -51,9 +51,18 @@ you're ready to charge.
 
 ## 4. Launch
 
+Pre-flight first (checks docker/compose, `.env` secrets, DNS, and ports 80/443):
+
 ```bash
-docker compose up -d --build
+./preflight.sh
+```
+
+Then bring the stack up, and once it's running confirm both sites are healthy:
+
+```bash
+make up                           # = docker compose up -d --build  (see `make help`)
 docker compose logs -f caddy      # watch it obtain TLS certs (Ctrl-C to stop tailing)
+./smoke.sh                        # checks https://allerion.io/healthz + https://skills.allerion.io/healthz
 ```
 
 Then open:
@@ -76,6 +85,11 @@ If certs don't issue: DNS isn't pointing here yet, or 80/443 are firewalled.
    back and get a real download link.
 3. **Go live**: swap in `sk_live_...` and `docker compose up -d`. Real cards now
    charge real money; purchases deliver the license-keyed zip instantly.
+4. **Add the webhook (recommended)** so sales record durably even if the buyer
+   closes the success page. In the Stripe Dashboard → Developers → Webhooks →
+   Add endpoint, enter `https://skills.allerion.io/webhook`, subscribe to the
+   `checkout.session.completed` event, and copy the generated **Signing secret**
+   (`whsec_…`) into `STRIPE_WEBHOOK_SECRET` in `.env`, then `docker compose up -d`.
 
 Optional — mint stable Stripe Price ids instead of inline prices (cleaner Stripe
 dashboard / analytics):
@@ -106,7 +120,17 @@ docker compose down               # stop (data persists in named volumes)
 ```
 
 Data lives in Docker volumes (`platform_data`, `store_data`) — SQLite for CRM
-leads and store orders. Back them up with `docker run --rm -v allerion_store_data:/d -v $PWD:/b busybox tar czf /b/store-backup.tgz /d`.
+leads and store orders. `make backup` tars both volumes to timestamped files;
+`make help` lists every shortcut (`up`, `down`, `logs`, `pull`, `ps`, `backup`).
+
+## Automate updates (optional)
+
+`.github/workflows/deploy.yml` can redeploy on every push: it SSHes into the VPS
+and runs `git pull --ff-only && docker compose up -d --build`. It stays inert
+until you add these repo secrets (GitHub → Settings → Secrets and variables →
+Actions): `VPS_HOST`, `VPS_USER`, `VPS_SSH_KEY` (a private key authorized on the
+box), and optional `VPS_PORT`. It assumes the repo is checked out at `~/allerion`
+on the VPS (step 2). Until then, just `make pull` on the box to update by hand.
 
 ## What "live" then means
 
