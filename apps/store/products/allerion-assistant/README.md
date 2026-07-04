@@ -39,7 +39,7 @@ All optional (see `.env.example`):
 | `ANTHROPIC_API_KEY` | — | **Required.** Your Anthropic key. |
 | `ANTHROPIC_BASE_URL` | api.anthropic.com | Point at your own Anthropic-compatible gateway. |
 | `ASSISTANT_MODEL` | `claude-opus-4-8` | Any current Claude model. |
-| `ASSISTANT_EFFORT` | `high` | `low` / `medium` / `high` / `xhigh` / `max`. Lower = faster/cheaper. |
+| `ASSISTANT_EFFORT` | `high` | `low` / `medium` / `high` / `max` (some models also accept `xhigh`). Lower = faster/cheaper. |
 | `ASSISTANT_SYSTEM` | a sensible default | The assistant's persona / instructions. |
 | `ASSISTANT_MAX_TOKENS` | `8000` | Max output tokens per reply. |
 | `ASSISTANT_NAME` | `Allerion Assistant` | Title shown in the UI. |

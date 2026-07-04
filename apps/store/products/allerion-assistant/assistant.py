@@ -13,7 +13,8 @@ Config (all optional, via environment):
     ANTHROPIC_API_KEY     your key (required)
     ANTHROPIC_BASE_URL    point at your own gateway instead of api.anthropic.com
     ASSISTANT_MODEL       default: claude-opus-4-8
-    ASSISTANT_EFFORT      low | medium | high | xhigh | max   (default: high)
+    ASSISTANT_EFFORT      low | medium | high | max   (default: high;
+                          some models also accept xhigh — check your model)
     ASSISTANT_SYSTEM      the assistant's persona / system prompt
     ASSISTANT_MAX_TOKENS  default: 8000
     ASSISTANT_NAME        UI title (default: Allerion Assistant)
