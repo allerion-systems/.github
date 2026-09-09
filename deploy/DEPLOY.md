@@ -98,6 +98,11 @@ STRIPE_API_KEY=sk_live_... python3 ../apps/store/setup_stripe.py   # prints expo
 # paste the printed STRIPE_PRICE_* values into deploy/.env, then: docker compose up -d
 ```
 
+**Test-mode Price ids already exist** for the sandbox account
+`acct_1TissgDCOCaYiMmZ` — see `deploy/stripe-prices.test.env`. While rehearsing
+with that account's `sk_test_` key, append that file's lines to `.env`. For live
+mode, mint fresh ids with the command above (test ids don't work with live keys).
+
 ## 6. If you already run the AI gateway (`infra/ai-gateway`)
 
 That stack ships its **own** Caddy, and only one process can bind ports 80/443.
