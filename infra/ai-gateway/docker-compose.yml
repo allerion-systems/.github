@@ -1,0 +1,80 @@
+name: allerion-ai-gateway
+
+# api.allerion.io  ──TLS──>  Caddy  ──>  LiteLLM  ──>  NVIDIA hosted API
+#
+# LiteLLM is the OpenAI-compatible control plane: it authenticates YOUR
+# clients with virtual keys, swaps in the real NVIDIA key server-side, and
+# enforces rate limits / budgets. Caddy terminates TLS for api.allerion.io.
+# Postgres backs LiteLLM's virtual keys, teams, and spend tracking.
+#
+# No GPU here — inference runs on NVIDIA's side. When you later stand up your
+# own NIM/vLLM GPU boxes, add them to litellm/config.yaml and the gateway,
+# clients, and keys stay exactly the same.
+
+services:
+  caddy:
+    image: caddy:2
+    restart: unless-stopped
+    ports:
+      - "80:80"
+      - "443:443"
+    volumes:
+      - ./Caddyfile:/etc/caddy/Caddyfile:ro
+      - caddy_data:/data
+      - caddy_config:/config
+    depends_on:
+      - litellm
+
+  litellm:
+    image: ghcr.io/berriai/litellm:main-stable
+    restart: unless-stopped
+    command: ["--config", "/app/config.yaml", "--port", "4000"]
+    environment:
+      LITELLM_MASTER_KEY: ${LITELLM_MASTER_KEY:?set LITELLM_MASTER_KEY in .env}
+      LITELLM_SALT_KEY: ${LITELLM_SALT_KEY:?set LITELLM_SALT_KEY in .env}
+      NVIDIA_API_KEY: ${NVIDIA_API_KEY:?set NVIDIA_API_KEY in .env}
+      DATABASE_URL: postgresql://litellm:${POSTGRES_PASSWORD:?set POSTGRES_PASSWORD in .env}@postgres:5432/litellm
+      STORE_MODEL_IN_DB: "True"
+    volumes:
+      - ./litellm/config.yaml:/app/config.yaml:ro
+    # Only exposed inside the compose network; the internet reaches it via Caddy.
+    expose:
+      - "4000"
+    depends_on:
+      postgres:
+        condition: service_healthy
+
+  postgres:
+    image: postgres:16
+    restart: unless-stopped
+    environment:
+      POSTGRES_USER: litellm
+      POSTGRES_PASSWORD: ${POSTGRES_PASSWORD:?set POSTGRES_PASSWORD in .env}
+      POSTGRES_DB: litellm
+    volumes:
+      - pg_data:/var/lib/postgresql/data
+    healthcheck:
+      test: ["CMD-SHELL", "pg_isready -U litellm -d litellm"]
+      interval: 10s
+      timeout: 5s
+      retries: 5
+
+  # Metered billing: streams LiteLLM usage into Stripe. Opt-in — only starts
+  # with:  docker compose --profile billing up -d
+  billing:
+    build: ./billing
+    restart: unless-stopped
+    profiles: ["billing"]
+    environment:
+      DATABASE_URL: postgresql://litellm:${POSTGRES_PASSWORD:?set POSTGRES_PASSWORD in .env}@postgres:5432/litellm
+      STRIPE_API_KEY: ${STRIPE_API_KEY:-}
+      STRIPE_METER_EVENT_NAME: ${STRIPE_METER_EVENT_NAME:-allerion_api_usage}
+      BILLING_SYNC_INTERVAL: ${BILLING_SYNC_INTERVAL:-60}
+    depends_on:
+      postgres:
+        condition: service_healthy
+
+volumes:
+  caddy_data:
+  caddy_config:
+  pg_data:

@@ -1,0 +1,32 @@
+# Allerion — single Caddy fronting the customer-facing web with automatic HTTPS.
+# Caddy provisions and renews Let's Encrypt certs for every hostname below,
+# as long as their DNS A records point at this VPS and ports 80/443 are open.
+
+{
+	# Email for Let's Encrypt expiry notices (override via .env -> compose).
+	email {$ACME_EMAIL:admin@allerion.io}
+}
+
+# Marketing site + embedded CRM
+allerion.io, www.allerion.io {
+	encode gzip
+	reverse_proxy platform:8099
+}
+
+# Self-serve skills store (Stripe checkout + license-gated downloads)
+skills.allerion.io {
+	encode gzip
+	reverse_proxy store:8088
+}
+
+# --- Optional: serve the AI gateway from this same Caddy ---------------------
+# If you already run infra/ai-gateway with its OWN Caddy, only ONE process can
+# bind ports 80/443 on this box. Easiest fix: stop the gateway's standalone
+# Caddy, point its LiteLLM container at this network, and uncomment this block
+# so a single Caddy serves everything. (LiteLLM streams, so keep flush_interval.)
+#
+# api.allerion.io {
+# 	reverse_proxy litellm:4000 {
+# 		flush_interval -1
+# 	}
+# }

@@ -1,0 +1,62 @@
+# Allerion customer-facing web — one command to go live.
+#
+#   cd deploy && cp .env.example .env   # then fill in .env
+#   docker compose up -d --build
+#
+# Caddy terminates TLS for allerion.io + skills.allerion.io and reverse-proxies
+# to the two stdlib Python apps. SQLite data persists in named volumes.
+
+services:
+  caddy:
+    image: caddy:2
+    restart: unless-stopped
+    ports:
+      - "80:80"
+      - "443:443"
+    environment:
+      - ACME_EMAIL=${ACME_EMAIL:-admin@allerion.io}
+    volumes:
+      - ./Caddyfile:/etc/caddy/Caddyfile:ro
+      - caddy_data:/data
+      - caddy_config:/config
+    depends_on:
+      - platform
+      - store
+
+  platform:
+    build: ../apps/platform
+    restart: unless-stopped
+    environment:
+      - PLATFORM_BASE_URL=${PLATFORM_BASE_URL:-https://allerion.io}
+      - STORE_URL=${STORE_URL:-https://skills.allerion.io}
+      - STRIPE_API_KEY=${STRIPE_API_KEY:-}
+      - STRIPE_PRICE_TEAM=${STRIPE_PRICE_TEAM:-}
+      - ALLERION_CRM_DB=/data/crm.db
+    volumes:
+      - platform_data:/data
+
+  store:
+    build: ../apps/store
+    restart: unless-stopped
+    environment:
+      - STORE_BASE_URL=${STORE_BASE_URL:-https://skills.allerion.io}
+      - STORE_SIGNING_SECRET=${STORE_SIGNING_SECRET:?set STORE_SIGNING_SECRET in .env}
+      - STRIPE_API_KEY=${STRIPE_API_KEY:-}
+      - STRIPE_WEBHOOK_SECRET=${STRIPE_WEBHOOK_SECRET:-}
+      - STORE_DB=/data/store.db
+      # Optional stable Stripe Price ids (from setup_stripe.py). Leave blank to
+      # use inline price_data.
+      - STRIPE_PRICE_PR_REVIEW_PRO=${STRIPE_PRICE_PR_REVIEW_PRO:-}
+      - STRIPE_PRICE_CHANGELOG_CRAFT=${STRIPE_PRICE_CHANGELOG_CRAFT:-}
+      - STRIPE_PRICE_TEST_FORGE=${STRIPE_PRICE_TEST_FORGE:-}
+      - STRIPE_PRICE_CODEX_DEVKIT=${STRIPE_PRICE_CODEX_DEVKIT:-}
+      - STRIPE_PRICE_DEVKIT_BUNDLE=${STRIPE_PRICE_DEVKIT_BUNDLE:-}
+      - STRIPE_PRICE_ALLERION_ASSISTANT=${STRIPE_PRICE_ALLERION_ASSISTANT:-}
+    volumes:
+      - store_data:/data
+
+volumes:
+  caddy_data:
+  caddy_config:
+  platform_data:
+  store_data:
